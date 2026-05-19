@@ -2306,13 +2306,13 @@ function walkLadder(idx) {
     if(t < 1) {
       ladderRAF = requestAnimationFrame(animate)
     } else {
+      ladderWalking = false
+      window._ladderActiveIdx = -1
       drawLadder(pxPath, null, idx, endCol)
       playDing()
       const result = ladderData.results[endCol]
       document.getElementById('ladder-result').innerHTML =
         `<div class="roulette-result-popup" style="font-size:24px;">${ladderData.players[idx]} → 🎉 ${result}</div>`
-      ladderWalking = false
-      window._ladderActiveIdx = -1
     }
   }
   ladderRAF = requestAnimationFrame(animate)
