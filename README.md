@@ -1,28 +1,17 @@
-# 움공플레이 v1.2
+# 움공플레이 v1.3 Stage
 
-원본 이음플레이 스타일을 기준으로 다시 정리한 교회 레크리에이션 웹앱입니다.
-
-## 포함 게임
-- 스톱워치
-- 타이머
-- 주사위 / 윷놀이
-- 랜덤 뽑기
-- 빙고
-- 단어 릴레이
-- 문장 매칭
-- 초성 게임
-- 사진 맞추기
-- 성경 넌센스 배틀
+이음플레이 참고형 무대 진행 버전입니다.
 
 ## 실행
-```bash
 npm install
 npm run dev
-```
 
 ## 배포
-Vercel 설정:
-- Framework Preset: Vite
+- Vercel Framework: Vite
 - Build Command: npm run build
 - Output Directory: dist
 - Install Command: npm install
+
+## GitHub 업로드
+올릴 것: index.html, package.json, README.md, vite.config.js, src/
+올리지 말 것: node_modules, dist, package-lock.json
