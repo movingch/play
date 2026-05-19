@@ -1,14 +1,2323 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#07101f" />
-    <meta name="description" content="움직이는교회 공동체 레크리에이션 웹앱, 움공플레이" />
-    <title>움공플레이</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>움공플래이 — 움직여! 움직여!</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0a0a0a;
+  --bg2:         #1a1a1a;
+  --bg3:         #262626;
+  --bg-card:     #1e293b;
+  --border:      rgba(255,255,255,0.12);
+  --border-hi:   rgba(56,189,248,0.45);
+  --text:        #f8fafc;
+  --text2:       #cbd5e1;
+  --text3:       #94a3b8;
+  --cyan:        #38bdf8;
+  --cyan-d:      #0ea5e9;
+  --gold:        #fbbf24;
+  --radius:      16px;
+  --radius-sm:   10px;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(30,64,175,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(220,38,38,0.10) 0%, transparent 50%);
+  color: var(--text);
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.3); border-radius: 4px; }
+
+.page { display: none; min-height: 100vh; }
+.page.active { display: flex; flex-direction: column; }
+
+.container { max-width: 480px; margin: 0 auto; padding: 0 18px; width: 100%; }
+
+.hdr-wrap { position: sticky; top: 0; z-index: 50; background: rgba(10,10,10,0.94); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+.hdr {
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  max-width: 480px; margin: 0 auto; width: 100%;
+}
+.btn-back {
+  width: 40px; height: 40px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.btn-back:hover { background: var(--bg3); color: var(--text); }
+.hdr-title { font-size: 18px; font-weight: 800; color: var(--text); flex: 1; letter-spacing: -0.01em; }
+.hdr-right { margin-left: auto; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.card-accent { background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.2); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px; border-radius: var(--radius);
+  font-size: 16px; font-weight: 700;
+  cursor: pointer; border: none;
+  transition: transform 0.12s, opacity 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.45; pointer-events: none; }
+.btn-primary {
+  background: linear-gradient(135deg, #0891b2, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(8,145,178,0.4);
+  border: 1px solid rgba(56,189,248,0.4);
+}
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(220,38,38,0.35);
+  border: 1px solid rgba(239,68,68,0.35);
+}
+.btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 6px 24px rgba(16,185,129,0.35); border: 1px solid rgba(16,185,129,0.4); }
+.btn-ghost { background: var(--bg2); color: var(--text3); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text2); }
+.btn-full { width: 100%; }
+.btn-lg { padding: 18px 28px; font-size: 18px; border-radius: 20px; }
+
+.section-label {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 10px;
+}
+.text-sm { font-size: 14px; }
+.text-muted { color: var(--text3); }
+.mb-2 { margin-bottom: 12px; }
+.mb-3 { margin-bottom: 18px; }
+.mt-2 { margin-top: 12px; }
+.mt-3 { margin-top: 18px; }
+.pb-safe { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+
+.verse-banner {
+  background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.15);
+  border-radius: var(--radius); padding: 14px 16px; margin: 14px 0;
+}
+.verse-banner p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+.verse-banner span { font-size: 12px; color: var(--cyan); font-weight: 700; }
+
+.howto { margin: 0 0 18px; }
+.howto-toggle {
+  background: var(--bg2); border: 1px solid var(--border);
+  width: 100%; padding: 12px 16px; border-radius: var(--radius-sm);
+  color: var(--text3); font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.howto-body {
+  margin-top: 4px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 14px 16px; display: none;
+}
+.howto-body.open { display: block; }
+.howto-body ol { padding-left: 20px; }
+.howto-body li { font-size: 13px; color: var(--text2); margin-bottom: 6px; line-height: 1.6; }
+
+.progress-wrap { height: 6px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+.progress-bar  { height: 100%; transition: width 0.4s; }
+
+.pill-tabs {
+  display: grid; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 4px; gap: 4px;
+}
+.pill-tab {
+  padding: 10px; border-radius: 10px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none; background: transparent; color: var(--text3);
+  transition: all 0.15s;
+}
+.pill-tab.active {
+  background: var(--bg3); color: var(--cyan);
+  border: 1px solid var(--border-hi);
+}
+
+/* ── HOME ── */
+#page-home { padding-bottom: 32px; }
+.home-hero {
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 22px;
+  padding: 22px 20px;
+  margin: 20px 0 22px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+}
+.home-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.04), transparent 60%);
+  pointer-events: none;
+}
+.hero-logo-img {
+  max-width: 260px; width: 80%;
+  display: block; margin: 0 auto 12px;
+}
+.hero-tagline {
+  font-size: 13px; font-weight: 900;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  margin-top: 4px;
+  text-shadow: 0 0 12px rgba(251,191,36,0.4);
+}
+.hero-desc { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 6px; line-height: 1.5; }
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 24px;
+}
+.game-card {
+  aspect-ratio: 1;
+  border-radius: 18px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative; overflow: hidden;
+  padding: 10px 6px 12px;
+}
+.game-card:active { transform: scale(0.94); }
+.game-card .emoji { font-size: 34px; margin-bottom: 6px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+.game-card .name { font-size: 12px; font-weight: 800; color: #fff; text-align: center; line-height: 1.3; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.game-card .badge-new {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 9px; font-weight: 900;
+  background: #facc15; color: #422006;
+  padding: 2px 5px; border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+/* ── STOPWATCH ── */
+.display-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.time-display {
+  font-size: clamp(64px, 18vw, 128px);
+  font-weight: 900; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em; line-height: 1;
+  transition: color 0.3s, text-shadow 0.3s; text-align: center;
+}
+.btn-row { display: flex; gap: 12px; padding: 20px 0 32px; }
+.btn-row .btn-ghost { flex: 1; }
+.btn-row .btn-primary, .btn-row .btn-danger, .btn-row .btn-success { flex: 2; }
+
+/* ── TIMER ── */
+#page-timer .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 10px; justify-content: center; }
+.preset-btn {
+  padding: 8px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text3);
+  transition: all 0.15s;
+}
+.preset-btn.active { background: rgba(56,189,248,0.15); color: var(--cyan); border-color: rgba(56,189,248,0.4); }
+#page-timer .custom-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+#page-timer input[type=number] {
+  padding: 9px 14px; border-radius: 10px;
+  background: var(--bg2); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; font-weight: 700;
+  text-align: center; width: 130px; outline: none;
+}
+#page-timer .circle-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#page-timer .timer-svg-wrap { position: relative; width: 260px; height: 260px; }
+#page-timer .timer-svg-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+#page-timer .timer-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#page-timer .timer-num { font-size: 64px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.5s, text-shadow 0.5s; }
+#page-timer .timer-sub { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+/* ── DICE ── */
+.dice-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 20px; }
+.dice-faces { display: flex; gap: 20px; perspective: 800px; }
+.die {
+  width: 110px; height: 110px;
+  background: linear-gradient(135deg, #fafafa, #e4e4e7, #a1a1aa);
+  border: 2px solid #52525b; border-radius: 20px;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  padding: 12px; gap: 2px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6), inset 0 -4px 8px rgba(0,0,0,0.18);
+}
+.die-cell { display: flex; align-items: center; justify-content: center; }
+.dot { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #475569, #0f172a); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+.die.rolling { animation: spin3d 0.55s linear infinite; }
+@keyframes spin3d {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(360deg) rotateY(240deg) rotateZ(120deg); }
+}
+.sum-display { text-align: center; min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sum-num { font-size: 80px; font-weight: 900; color: #fb923c; text-shadow: 0 0 40px rgba(251,146,60,0.7); animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop {
+  0% { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.yut-sticks { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 380px; }
+.yut-stick {
+  height: 60px; border-radius: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.15em;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.55), inset 0 -4px 8px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+.yut-stick.flat { background: linear-gradient(180deg, #fbe8b6, #d6c08e, #a8884d); border: 3px solid #9a7d4a; color: #7a6238; }
+.yut-stick.round { background: linear-gradient(180deg, #7a5638, #5a3e25, #2d1b0e); border: 3px solid #1a0e06; color: #d6b888; }
+.yut-stick.rolling { animation: yutSpin 0.65s linear infinite; }
+@keyframes yutSpin {
+  0% { transform: rotateZ(0deg) rotateX(0deg); }
+  100% { transform: rotateZ(360deg) rotateX(360deg); }
+}
+.yut-result { text-align: center; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.yut-result .yut-name { font-size: 88px; font-weight: 900; line-height: 1; text-shadow: 0 0 40px currentColor; }
+.yut-result .yut-desc { font-size: 15px; color: var(--text3); margin-top: 4px; }
+
+/* ── RANDOM PICK ── */
+.pick-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; }
+.drum-display {
+  width: 260px; height: 90px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.drum-name {
+  font-size: 38px; font-weight: 900; color: var(--cyan);
+  text-shadow: 0 0 20px rgba(56,189,248,0.5); white-space: nowrap;
+}
+.pick-result {
+  font-size: 42px; font-weight: 900; color: var(--cyan);
+  text-shadow: 0 0 30px rgba(56,189,248,0.6);
+  animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); text-align: center;
+}
+.names-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.name-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 20px;
+  font-size: 14px; font-weight: 600; color: var(--text2);
+}
+.name-chip .remove-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+.name-chip .remove-btn:hover { color: #f87171; }
+.name-input-row { display: flex; gap: 8px; margin-top: 14px; }
+.name-input-row input {
+  flex: 1; padding: 12px 16px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 15px; outline: none;
+}
+.name-input-row input:focus { border-color: var(--border-hi); }
+.name-input-row button {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--cyan-d), #1d4ed8);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-size: 20px; font-weight: 900; cursor: pointer;
+}
+
+/* ── BINGO ── */
+.bingo-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bingo-subjects { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cat-card, .subject-card {
+  aspect-ratio: 1; border-radius: 18px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; border: none; padding: 16px;
+  transition: transform 0.15s; -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.cat-card:active, .subject-card:active { transform: scale(0.94); }
+.cat-card .emoji, .subject-card .emoji { font-size: 40px; }
+.cat-card .label-text { font-size: 16px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.cat-card .count { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 600; }
+.subject-card .label-text { font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); text-align: center; }
+.subject-card .word-count { font-size: 11px; color: rgba(255,255,255,0.75); }
+.subject-card .size-badge { position: absolute; top: 8px; right: 8px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: rgba(0,0,0,0.45); color: #fff; }
+.bingo-play { flex: 1; display: flex; flex-direction: column; }
+.bingo-word-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+.bingo-word { font-weight: 900; line-height: 1; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.called-chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 12px 18px; }
+.called-chip { padding: 5px 12px; border-radius: 14px; font-size: 13px; font-weight: 600; }
+
+/* ── CHOSUNG / GUESS / NONSENSE / CHARADES / SCENES ── */
+.quiz-display { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; text-align: center; }
+.chosung-text { font-size: 72px; font-weight: 900; letter-spacing: 0.1em; color: #34d399; text-shadow: 0 0 30px rgba(52,211,153,0.5); animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.answer-reveal { font-size: 36px; font-weight: 800; color: var(--text); animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.hint-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px; margin: 0 auto; }
+.hint-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 18px;
+  font-size: 16px; color: var(--text2);
+  display: flex; align-items: center; gap: 12px;
+  animation: hintIn 0.4s ease;
+}
+@keyframes hintIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.hint-item .hint-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan-d), #1d4ed8);
+  color: #fff; font-weight: 900; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.charade-word {
+  font-size: 60px; font-weight: 900;
+  color: #fbbf24;
+  text-shadow: 0 0 40px rgba(251,191,36,0.5);
+  animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  line-height: 1.1;
+}
+.scene-text {
+  font-size: 26px; font-weight: 800; color: var(--text);
+  line-height: 1.5; text-align: center;
+  animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.theme-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.theme-card {
+  border-radius: var(--radius); padding: 16px;
+  background: var(--bg2); border: 1px solid var(--border);
+  cursor: pointer; text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.theme-card:hover { border-color: var(--border-hi); background: var(--bg3); }
+.theme-card .emoji { font-size: 32px; margin-bottom: 8px; display: block; }
+.theme-card .tname { font-size: 15px; font-weight: 700; color: var(--text); }
+.theme-card .tcount { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.answer-pool {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  margin: 14px 0; max-height: 200px; overflow-y: auto;
+}
+.pool-word { display: inline-block; margin: 3px; padding: 5px 10px; background: var(--bg3); border-radius: 8px; font-size: 13px; color: var(--text2); }
+.diff-btns { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin: 14px 0; }
+.diff-btn {
+  padding: 12px; border-radius: 12px; text-align: center;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text3);
+}
+.diff-btn.selected { border-color: var(--border-hi); color: var(--cyan); background: rgba(56,189,248,0.1); }
+.sentence-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 14px 0; }
+.sentence-front { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.5; }
+.sentence-back  { font-size: 17px; font-weight: 600; color: var(--cyan); line-height: 1.5; margin-top: 12px; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.sentence-ref   { font-size: 13px; color: var(--text3); margin-top: 8px; }
+
+/* ── ROULETTE ── */
+.roulette-wrap { position: relative; width: 300px; height: 300px; margin: 20px auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4)); }
+.roulette-pointer {
+  position: absolute; top: -10px; left: 50%;
+  width: 0; height: 0; z-index: 5;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 28px solid #ef4444;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  transform-origin: 50% 0%;
+  transform: translateX(-50%);
+}
+.roulette-pointer.tick { animation: pointerTick 0.14s ease; }
+@keyframes pointerTick {
+  0%   { transform: translateX(-50%) rotate(0deg); }
+  40%  { transform: translateX(-50%) rotate(-22deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+.roulette-svg { width: 100%; height: 100%; }
+.roulette-svg.spinning { will-change: transform; }
+.roulette-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px; height: 64px;
+  background: radial-gradient(circle at 30% 30%, #1f1f1f, #000);
+  border: 4px solid #fff;
+  border-radius: 50%; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 900; font-size: 13px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 -3px 6px rgba(0,0,0,0.4);
+  letter-spacing: 0.05em;
+}
+.roulette-center.spinning { animation: centerPulse 0.6s ease-in-out infinite; }
+@keyframes centerPulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.6), 0 0 0 rgba(239,68,68,0); }
+  50%      { box-shadow: 0 4px 14px rgba(0,0,0,0.6), 0 0 28px rgba(239,68,68,0.85); }
+}
+.roulette-result-popup {
+  font-size: 36px; font-weight: 900;
+  color: var(--cyan);
+  text-shadow: 0 0 40px rgba(56,189,248,0.8);
+  animation: resultPop 0.7s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes resultPop {
+  0%   { transform: scale(0.3) rotate(-20deg); opacity: 0; filter: blur(10px); }
+  50%  { transform: scale(1.3) rotate(8deg); opacity: 1; filter: blur(0); }
+  75%  { transform: scale(0.9) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.roulette-status {
+  font-size: 15px; font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  animation: statusPulse 0.9s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.98); }
+}
+/* Ladder marker */
+.ladder-marker-rim {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+@keyframes pathDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes finishPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px currentColor); }
+  50%      { transform: scale(1.15); filter: drop-shadow(0 0 24px currentColor); }
+}
+
+/* ── OVERLAPPING PHOTOS ── */
+.overlap-stage {
+  position: relative; aspect-ratio: 4/3;
+  background: #000; border-radius: var(--radius);
+  overflow: hidden; border: 1px solid var(--border);
+}
+.overlap-stage img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  mix-blend-mode: lighten;
+}
+
+/* ── LADDER ── */
+.ladder-wrap {
+  position: relative; width: 100%;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.ladder-svg { width: 100%; height: auto; display: block; }
+.ladder-controls { display: grid; gap: 14px; margin: 14px 0; }
+
+.fade-in { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="page-home" class="page active fade-in">
+  <div class="container">
+    <div class="home-hero">
+      <img class="hero-logo-img" id="hero-logo" alt="움직이는교회">
+      <div class="hero-tagline">✦ 움직여! 움직여! 움공플래이 ✦</div>
+      <div class="hero-desc">움직이는 교회 · 16가지 친교 게임</div>
+    </div>
+
+    <p class="section-label">🎲 게임 모음 (16종)</p>
+    <div class="games-grid" id="games-grid"></div>
+
+    <div class="card card-accent">
+      <p style="font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px;">💡 사용 안내</p>
+      <p style="font-size:14px;color:var(--text2);line-height:1.7;">
+        말씀·찬양·교제 — 마음을 잇는 다양한 게임을 제공합니다.<br>
+        진행자 멘트와 사용법이 함께 들어 있어 초보자도 즉시 사용할 수 있습니다.
+      </p>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:20px;letter-spacing:0.05em;">
+      © 움직이는교회 · Moving Church
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════ STOPWATCH ═══════════════ -->
+<div id="page-stopwatch" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">⏱ 스톱워치</span>
+  </div></div>
+  <div class="container" style="flex:1;display:flex;flex-direction:column;">
+    <div class="verse-banner"><p>"세월을 아끼라 때가 악하니라"</p><span>엡 5:16</span></div>
+    <div class="display-wrap"><div id="sw-display" class="time-display" style="color:#f8fafc;">00:00:00</div></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="swReset()">리셋</button>
+      <button id="sw-btn" class="btn btn-primary btn-lg" onclick="swToggle()">시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TIMER ═══════════════ -->
+<div id="page-timer" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">⏳ 타이머</span>
+  </div></div>
+  <div class="container" style="flex:1;display:flex;flex-direction:column;">
+    <div class="verse-banner"><p>"범사에 기한이 있고 천하 만사가 다 때가 있나니"</p><span>전 3:1</span></div>
+    <div class="presets" id="timer-presets"></div>
+    <div class="custom-row">
+      <input type="number" id="timer-custom" placeholder="직접 입력 (초)" min="1">
+      <button class="btn btn-ghost" style="padding:9px 16px;font-size:14px;" onclick="applyCustomTimer()">적용</button>
+    </div>
+    <div class="circle-wrap">
+      <div class="timer-svg-wrap">
+        <svg width="260" height="260" viewBox="0 0 260 260">
+          <circle cx="130" cy="130" r="115" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+          <circle id="timer-arc" cx="130" cy="130" r="115" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-dasharray="722.6" stroke-dashoffset="0" style="transition:stroke-dashoffset 0.9s linear,stroke 0.5s;filter:drop-shadow(0 0 8px rgba(56,189,248,0.4))"/>
+        </svg>
+        <div class="timer-center">
+          <div id="timer-num" class="timer-num" style="color:#38bdf8;">01:00</div>
+          <div id="timer-sub" class="timer-sub">60초 남음</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="timerReset()">리셋</button>
+      <button id="timer-btn" class="btn btn-primary btn-lg" onclick="timerToggle()">시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DICE ═══════════════ -->
+<div id="page-dice" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title" id="dice-title">🎲 주사위 굴리기</span>
+  </div></div>
+  <div class="container" style="flex:1;display:flex;flex-direction:column;">
+    <div class="verse-banner" style="margin-top:14px;"><p>"제비는 사람이 뽑으나 모든 일을 작정하기는 여호와께 있느니라"</p><span>잠 16:33</span></div>
+    <div class="pill-tabs" style="grid-template-columns:1fr 1fr;" id="dice-mode-tabs">
+      <button class="pill-tab active" onclick="setDiceMode('dice')">🎲 주사위</button>
+      <button class="pill-tab" onclick="setDiceMode('yut')">🎴 윷놀이</button>
+    </div>
+    <div id="dice-count-row" class="pill-tabs mt-2" style="grid-template-columns:1fr 1fr;">
+      <button class="pill-tab active" onclick="setDiceCount(1)">1개</button>
+      <button class="pill-tab" onclick="setDiceCount(2)">2개</button>
+    </div>
+    <div class="dice-area">
+      <div class="dice-faces" id="dice-faces"></div>
+      <div class="sum-display" id="dice-result"></div>
+    </div>
+    <div style="padding:0 0 32px;">
+      <button id="dice-roll-btn" class="btn btn-danger btn-full btn-lg" onclick="rollDice()">🎲 굴리기!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ BINGO ═══════════════ -->
+<div id="page-bingo" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="bingoBack()">←</button>
+    <span class="hdr-title" id="bingo-title">🎯 빙고 게임</span>
+    <div class="hdr-right" id="bingo-progress-label" style="font-size:13px;font-weight:800;color:var(--text3);"></div>
+  </div></div>
+  <div id="bingo-content" class="container" style="flex:1;display:flex;flex-direction:column;padding-top:14px;"></div>
+</div>
+
+<!-- ═══════════════ CHOSUNG ═══════════════ -->
+<div id="page-chosung" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="chosungBack()">←</button>
+    <span class="hdr-title" id="chosung-title">🔤 초성 게임</span>
+  </div></div>
+  <div id="chosung-content" class="container" style="flex:1;display:flex;flex-direction:column;padding-top:14px;"></div>
+</div>
+
+<!-- ═══════════════ RANDOM PICK ═══════════════ -->
+<div id="page-random" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">🎰 랜덤 뽑기</span>
+  </div></div>
+  <div class="container" style="flex:1;display:flex;flex-direction:column;">
+    <div class="pick-area">
+      <div class="drum-display"><div id="drum-name" class="drum-name">?</div></div>
+      <div id="pick-result" style="min-height:60px;"></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2);cursor:pointer;">
+        <input type="checkbox" id="exclude-check" style="width:18px;height:18px;accent-color:var(--cyan);">
+        뽑힌 이름 제외
+      </label>
+    </div>
+    <div id="names-list" class="names-list"></div>
+    <div class="name-input-row">
+      <input type="text" id="name-input" placeholder="이름 입력" maxlength="10" onkeydown="if(event.key==='Enter')addName()">
+      <button onclick="addName()">+</button>
+    </div>
+    <div style="margin-top:12px;padding-bottom:24px;">
+      <button id="roll-btn" class="btn btn-full btn-lg" onclick="toggleRoll()" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 6px 24px rgba(99,102,241,0.4);">🎰 돌리기!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ WORD RELAY ═══════════════ -->
+<div id="page-relay" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="relayBack()">←</button>
+    <span class="hdr-title" id="relay-title">🔗 단어 릴레이</span>
+  </div></div>
+  <div id="relay-content" class="container" style="padding-top:14px;"></div>
+</div>
+
+<!-- ═══════════════ SENTENCE MATCH ═══════════════ -->
+<div id="page-sentence" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="sentenceBack()">←</button>
+    <span class="hdr-title" id="sentence-title">📜 문장 매칭</span>
+  </div></div>
+  <div id="sentence-content" class="container" style="padding-top:14px;"></div>
+</div>
+
+<!-- ═══════════════ PHOTO GUESS ═══════════════ -->
+<div id="page-photo" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">📷 사진 맞추기</span>
+  </div></div>
+  <div class="container" style="padding-top:20px;">
+    <div id="photo-library"></div>
+    <div style="margin-top:12px;">
+      <label class="btn btn-primary btn-full" style="cursor:pointer;justify-content:center;display:flex;gap:8px;">
+        <input type="file" accept="image/*" id="photo-file-input" style="display:none" onchange="addPhoto(this)">
+        📷 + 사진 추가
+      </label>
+    </div>
+    <div id="photo-game-area" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ WHO AM I (성경 인물 추리) ═══════════════ -->
+<div id="page-whoami" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="whoamiBack()">←</button>
+    <span class="hdr-title" id="whoami-title">🕵️ 내가 누구게</span>
+    <div class="hdr-right" id="whoami-progress-label" style="font-size:13px;font-weight:800;color:var(--text3);"></div>
+  </div></div>
+  <div id="whoami-content" class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;"></div>
+</div>
+
+<!-- ═══════════════ NONSENSE (성경 넌센스) ═══════════════ -->
+<div id="page-nonsense" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="nonsenseBack()">←</button>
+    <span class="hdr-title" id="nonsense-title">🤪 성경 넌센스</span>
+    <div class="hdr-right" id="nonsense-progress-label" style="font-size:13px;font-weight:800;color:var(--text3);"></div>
+  </div></div>
+  <div id="nonsense-content" class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;"></div>
+</div>
+
+<!-- ═══════════════ CHARADES (몸으로 말해요) ═══════════════ -->
+<div id="page-charades" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="charadesBack()">←</button>
+    <span class="hdr-title" id="charades-title">💃 몸으로 말해요</span>
+    <div class="hdr-right" id="charades-progress-label" style="font-size:13px;font-weight:800;color:var(--text3);"></div>
+  </div></div>
+  <div id="charades-content" class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;"></div>
+</div>
+
+<!-- ═══════════════ BIBLE SCENES (성경 장면) ═══════════════ -->
+<div id="page-scenes" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="scenesBack()">←</button>
+    <span class="hdr-title" id="scenes-title">🎭 성경 장면</span>
+    <div class="hdr-right" id="scenes-progress-label" style="font-size:13px;font-weight:800;color:var(--text3);"></div>
+  </div></div>
+  <div id="scenes-content" class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;"></div>
+</div>
+
+<!-- ═══════════════ ROULETTE ═══════════════ -->
+<div id="page-roulette" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">🎡 룰렛 돌리기</span>
+  </div></div>
+  <div class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;">
+    <div class="verse-banner"><p>"제비는 사람이 뽑으나 모든 일을 작정하기는 여호와께 있느니라"</p><span>잠 16:33</span></div>
+    <div class="roulette-wrap">
+      <div class="roulette-pointer" id="roulette-pointer"></div>
+      <svg class="roulette-svg" id="roulette-svg" viewBox="0 0 300 300"></svg>
+      <div class="roulette-center" id="roulette-center">SPIN</div>
+    </div>
+    <div id="roulette-result" style="text-align:center;min-height:60px;display:flex;align-items:center;justify-content:center;"></div>
+    <div id="roulette-items" class="names-list" style="margin-top:10px;"></div>
+    <div class="name-input-row">
+      <input type="text" id="roulette-input" placeholder="항목 입력 (예: 발표, 청소, 노래)" maxlength="12" onkeydown="if(event.key==='Enter')addRouletteItem()">
+      <button onclick="addRouletteItem()">+</button>
+    </div>
+    <div style="margin-top:12px;padding-bottom:28px;">
+      <button class="btn btn-primary btn-full btn-lg" onclick="spinRoulette()">🎡 돌리기!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ OVERLAP PHOTOS (겹친 사진) ═══════════════ -->
+<div id="page-overlap" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">🖼 겹친 사진 맞추기</span>
+  </div></div>
+  <div class="container" style="padding-top:20px;">
+    <div class="howto">
+      <button class="howto-toggle" onclick="toggleHowto(this)">📖 사용법 <span>▾</span></button>
+      <div class="howto-body">
+        <ol>
+          <li>2~5장의 사진을 추가합니다.</li>
+          <li>여러 사진이 합성되어 한 장처럼 보입니다.</li>
+          <li>학생들이 어떤 사진들인지 맞춥니다.</li>
+          <li>"한 장씩 빼기"로 사진을 하나씩 제거하며 힌트를 줍니다.</li>
+        </ol>
+      </div>
+    </div>
+    <div id="overlap-stage" class="overlap-stage"></div>
+    <p style="text-align:center;font-size:13px;color:var(--text3);margin-top:10px;" id="overlap-count">사진을 추가해주세요</p>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+      <label class="btn btn-primary btn-full" style="cursor:pointer;justify-content:center;display:flex;gap:8px;">
+        <input type="file" accept="image/*" multiple style="display:none" onchange="addOverlapPhoto(this)">
+        🖼 + 사진 추가 (여러 장 가능)
+      </label>
+      <button class="btn btn-ghost btn-full" onclick="removeOverlapOne()">📤 한 장씩 빼기</button>
+      <button class="btn btn-ghost btn-full" onclick="clearOverlap()">🗑 모두 지우기</button>
+    </div>
+    <div id="overlap-labels" style="margin-top:14px;padding-bottom:28px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ LADDER (사다리타기) ═══════════════ -->
+<div id="page-ladder" class="page pb-safe">
+  <div class="hdr-wrap"><div class="hdr container">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <span class="hdr-title">🪜 사다리타기</span>
+  </div></div>
+  <div class="container" style="padding-top:14px;flex:1;display:flex;flex-direction:column;">
+    <div class="howto">
+      <button class="howto-toggle" onclick="toggleHowto(this)">📖 사용법 <span>▾</span></button>
+      <div class="howto-body">
+        <ol>
+          <li>참가자 수와 결과를 입력합니다 (2~8명).</li>
+          <li>"사다리 생성" 버튼을 누르면 무작위 사다리가 만들어집니다.</li>
+          <li>위쪽 이름(번호)을 탭하면 경로가 그려지고 결과가 표시됩니다.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="ladder-controls">
+      <div>
+        <p class="section-label">참가자 (콤마 또는 줄바꿈으로 구분)</p>
+        <textarea id="ladder-players" rows="2" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit;outline:none;" placeholder="민수, 영희, 철수, 영수">민수, 영희, 철수, 영수</textarea>
+      </div>
+      <div>
+        <p class="section-label">결과 (콤마 또는 줄바꿈으로 구분)</p>
+        <textarea id="ladder-results" rows="2" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit;outline:none;" placeholder="당첨, 꽝, 꽝, 꽝">당첨, 꽝, 꽝, 꽝</textarea>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="generateLadder()">🪜 사다리 생성</button>
+    </div>
+    <div class="ladder-wrap">
+      <svg class="ladder-svg" id="ladder-svg" viewBox="0 0 400 500"></svg>
+    </div>
+    <div id="ladder-result" style="text-align:center;min-height:40px;margin-top:10px;font-size:18px;font-weight:800;color:var(--cyan);"></div>
+    <p style="text-align:center;font-size:12px;color:var(--text3);margin:6px 0 28px;">위쪽 번호를 탭하면 경로가 표시됩니다</p>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   LOGO BASE64 (Moving Church)
+══════════════════════════════════════════════════ */
+const LOGO_B64 = "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";
+document.getElementById('hero-logo').src = 'data:image/jpeg;base64,' + LOGO_B64;
+
+/* ══════════════════════════════════════════════════
+   GAMES META (16 games)
+══════════════════════════════════════════════════ */
+const GAMES = [
+  { id:'stopwatch',  name:'스톱워치',     emoji:'⏱',  gradient:'linear-gradient(135deg,#0891b2,#1d4ed8)', accent:'#22d3ee', page:'stopwatch' },
+  { id:'timer',      name:'타이머',       emoji:'⏳',  gradient:'linear-gradient(135deg,#f59e0b,#d97706)', accent:'#fbbf24', page:'timer' },
+  { id:'random',     name:'랜덤 뽑기',    emoji:'🎰', gradient:'linear-gradient(135deg,#6366f1,#4f46e5)', accent:'#a5b4fc', page:'random' },
+  { id:'photo',      name:'사진 맞추기',  emoji:'📷', gradient:'linear-gradient(135deg,#8b5cf6,#7c3aed)', accent:'#a78bfa', page:'photo' },
+  { id:'chosung',    name:'초성 게임',    emoji:'🔤', gradient:'linear-gradient(135deg,#10b981,#059669)', accent:'#34d399', page:'chosung' },
+  { id:'dice',       name:'주사위/윷',    emoji:'🎲', gradient:'linear-gradient(135deg,#dc2626,#9a3412)', accent:'#fb923c', page:'dice' },
+  { id:'bingo',      name:'빙고',         emoji:'🎯', gradient:'linear-gradient(135deg,#0e7490,#1e3a8a)', accent:'#22d3ee', page:'bingo' },
+  { id:'relay',      name:'단어 릴레이',  emoji:'🔗', gradient:'linear-gradient(135deg,#a16207,#78350f)', accent:'#fcd34d', page:'relay' },
+  { id:'sentence',   name:'문장 매칭',    emoji:'📜', gradient:'linear-gradient(135deg,#0e7490,#1e40af)', accent:'#22d3ee', page:'sentence' },
+  { id:'whoami',     name:'내가 누구게',  emoji:'🕵️', gradient:'linear-gradient(135deg,#1e3a8a,#4c1d95)', accent:'#a78bfa', page:'whoami',  isNew:true },
+  { id:'nonsense',   name:'성경 넌센스',  emoji:'🤪', gradient:'linear-gradient(135deg,#db2777,#9f1239)', accent:'#f9a8d4', page:'nonsense', isNew:true },
+  { id:'charades',   name:'몸으로 말해요',emoji:'💃', gradient:'linear-gradient(135deg,#d97706,#92400e)', accent:'#fbbf24', page:'charades', isNew:true },
+  { id:'scenes',     name:'성경 장면',    emoji:'🎭', gradient:'linear-gradient(135deg,#0d9488,#134e4a)', accent:'#5eead4', page:'scenes',   isNew:true },
+  { id:'roulette',   name:'룰렛 돌리기',  emoji:'🎡', gradient:'linear-gradient(135deg,#ef4444,#dc2626)', accent:'#fca5a5', page:'roulette', isNew:true },
+  { id:'overlap',    name:'겹친 사진',    emoji:'🖼', gradient:'linear-gradient(135deg,#7c3aed,#5b21b6)', accent:'#c4b5fd', page:'overlap',  isNew:true },
+  { id:'ladder',     name:'사다리타기',   emoji:'🪜', gradient:'linear-gradient(135deg,#059669,#047857)', accent:'#6ee7b7', page:'ladder',   isNew:true },
+]
+
+/* ══════════════════════════════════════════════════
+   BIBLICAL DATA (FROM PDF + ADDITIONS)
+══════════════════════════════════════════════════ */
+const WHOAMI_CHARACTERS = [
+  { name:'다윗',     hints:['양치는 소년이었다','물맷돌 5개를 골랐다','거인을 쓰러뜨렸다','이스라엘의 두 번째 왕이 되었다','시편의 많은 부분을 썼다'] },
+  { name:'사울',     hints:['이스라엘의 첫 번째 왕이다','베냐민 지파 출신','키가 다른 사람보다 어깨 위만큼 컸다','다윗을 시기하여 죽이려 했다','길보아산에서 죽었다'] },
+  { name:'아브라함', hints:['믿음의 조상','갈대아 우르 출신','75세에 고향을 떠났다','100세에 아들을 낳았다','이삭을 제물로 바치려 했다'] },
+  { name:'삼손',     hints:['나실인이었다','긴 머리가 힘의 비결','맨손으로 사자를 죽였다','들릴라에게 비밀을 알려줬다','블레셋 신전 기둥을 무너뜨렸다'] },
+  { name:'모세',     hints:['갈대 상자에 담겨 떠내려갔다','바로의 딸이 길렀다','지팡이로 홍해를 갈랐다','시내산에서 십계명을 받았다','120세에 느보산에서 죽었다'] },
+  { name:'가인',     hints:['아담의 첫째 아들','농사꾼이었다','동생을 죽였다','이마에 표를 받았다','놋 땅에 살았다'] },
+  { name:'베드로',   hints:['갈릴리 어부였다','예수님이 반석이라 부르셨다','물 위를 걸었다','닭 울기 전 세 번 부인했다','오순절에 3천 명에게 설교했다'] },
+  { name:'골리앗',   hints:['블레셋 사람이다','거인이다 (키 약 3미터)','40일 동안 이스라엘을 조롱했다','거대한 갑옷을 입었다','어린 소년의 물맷돌에 맞아 죽었다'] },
+  { name:'누가',     hints:['이방인이었다','의사였다','복음서 한 권을 썼다','사도행전을 썼다','바울의 동역자였다'] },
+  { name:'엘리야',   hints:['길르앗 디셉 출신','3년 6개월 비가 안 오게 했다','갈멜산에서 바알 선지자들과 대결했다','까마귀가 음식을 가져다 주었다','불병거를 타고 승천했다'] },
+  { name:'아간',     hints:['유다 지파 사람','여리고 정복 후 물건을 훔쳤다','시날산 외투와 은과 금을 숨겼다','이스라엘이 아이성에서 진 원인','아골 골짜기에서 처형됐다'] },
+  { name:'한나',     hints:['엘가나의 아내','오랫동안 자녀가 없었다','실로에서 눈물로 기도했다','아들을 하나님께 바치겠다고 서원했다','사무엘의 어머니'] },
+  { name:'기드온',   hints:['므낫세 지파','포도주 틀에서 밀을 타작하고 있었다','양털로 두 번 사인을 구했다','300명의 용사를 골랐다','횃불과 항아리로 미디안을 무찔렀다'] },
+  { name:'노아',     hints:['홍수 시대의 의인','120년간 방주를 만들었다','동물 한 쌍씩 태웠다','40일 40밤 비가 내렸다','무지개 언약을 받았다'] },
+  { name:'라합',     hints:['여리고에 살았다','기생이었다','두 정탐꾼을 숨겨주었다','창문에 붉은 줄을 매달았다','예수님의 족보에 올랐다'] },
+]
+
+const NONSENSE_QUIZZES = [
+  { question:'성경에서 가장 처음 담배를 핀 사람은?', answer:'아담', hint:'"아~ 담배"' },
+  { question:'성경에서 가장 더위를 많이 탄 사람은?', answer:'에녹', hint:'"에이~ 녹는다"' },
+  { question:'성경에서 키가 가장 작은 사람은?', answer:'삭개오', hint:'세리장' },
+  { question:'성경에서 가장 오버하는 사람은?', answer:'오바댜', hint:'"오버한다"' },
+  { question:'성경에서 무엇이든 잘 하는 사람은?', answer:'하만', hint:'"하면 된다"' },
+  { question:'성경에서 가장 침대를 좋아한 사람은?', answer:'베드로', hint:'"bed로"' },
+  { question:'성경에서 사고 싶은 게 많은 사람은?', answer:'사무엘', hint:'"사! 무얼?"' },
+  { question:'성경에서 가장 자주 빌리는 사람은?', answer:'빌라도', hint:'"빌려도 빌려도"' },
+  { question:'성경에서 가장 모험적인 사람은?', answer:'모세', hint:'"모험 세계"' },
+  { question:'성경에서 자주 짜증내는 사람은?', answer:'에스라', hint:'"에이씨라!"' },
+  { question:'성경에서 자주 빌려서 못 갚는 사람은?', answer:'빌레몬', hint:'"빌려 못"' },
+  { question:'성경에서 시장에 자주 간 사람은?', answer:'마가', hint:'"마트에 가"' },
+  { question:'성경에서 가장 잘 가르치는 선생님은?', answer:'스승의 날 - 예수님', hint:'친히 본을 보이심' },
+  { question:'성경에서 가장 빨리 달린 사람은?', answer:'엘리야', hint:'마차보다 빠름 (왕상 18:46)' },
+  { question:'성경에서 가장 많이 운 사람은?', answer:'예레미야', hint:'눈물의 선지자' },
+]
+
+const CHARADES_DATA = {
+  movies:  { name:'영화', emoji:'🎬', accent:'#fb923c', words:['타짜','패션 오브 크라이스트','국가대표','반지의 제왕','해리포터','타이타닉','광해','엽문','겨울왕국','분노의 질주','스파이더 맨','토르','헐크','킹콩','라이온 킹'] },
+  animals: { name:'동물', emoji:'🐾', accent:'#34d399', words:['다람쥐','늑대','고릴라','강아지','코끼리','지렁이','북극곰','바다코끼리','낙타','목도리 도마뱀','고슴도치','소','나무늘보','독수리','말'] },
+  objects: { name:'사물', emoji:'📦', accent:'#a78bfa', words:['낚싯대','에프킬라','개사료','책꽂이','공기 청정기','물티슈','청소기','어항','냉장고','탁구대','세탁기','젓가락','체온계','무선 충전기','황채용 안경'] },
+  proverbs:{ name:'속담', emoji:'💬', accent:'#fbbf24', words:['원숭이도 나무에서 떨어진다','떡 줄 사람은 꿈도 안 꾸는데\n김칫국부터 마신다','백지장도 맞들면 낫다','발 없는 말이 천 리 간다','굼벵이도 구르는 재주가 있다','천 리 길도 한 걸음부터','가는 정이 있어야 오는 정이 있다','하늘이 무너져도 솟아날 구멍이 있다','뛰는 놈 위에 나는 놈 있다','믿는 도끼에 발등 찍힌다','종로에서 뺨 맞고 한강 가서 눈 흘긴다','칼로 물 베기','호랑이는 죽어서 가죽을 남기고\n사람은 죽어서 이름을 남긴다','사공이 많으면 배가 산으로 간다','호랑이도 제 말 하면 온다'] },
+}
+
+const BIBLE_SCENES = {
+  team1: [
+    '아담과 하와가 범죄하는 장면',
+    '홍해가 갈라져 이스라엘 백성이 건너는 장면',
+    '아브라함이 모리아산에서 이삭을 제물로 바친 장면',
+    '다니엘의 세 친구가 풀무불 속에 있는 장면',
+    '예수님께서 세례 받으시는 장면',
+  ],
+  team2: [
+    '바울이 다메섹으로 가다가 예수님을 만난 장면',
+    '다니엘이 기도하고 사자굴에 들어가는 장면',
+    '예수님께서 제자들의 발을 씻기는 장면',
+    '베드로가 닭이 울 때 예수님을 부인하는 장면',
+    '요셉이 보디발의 아내에게 유혹받는 장면',
+  ],
+  team3: [
+    '다윗이 골리앗을 이긴 장면',
+    '마리아가 예수님의 머리에 향유 붓는 장면',
+    '엘리야가 갈멜산에서 기도할 때 불이 내린 장면',
+    '밧세바가 다윗 앞에서 목욕하는 장면',
+    '바디매오가 눈을 뜨는 장면',
+  ],
+  team4: [
+    '베드로가 바닷가에서 제자로 부르심 받는 장면',
+    '이스라엘 백성들이 문설주와 문 인방에 피를 바른 장면',
+    '여호수아 때 여리고 성이 무너지는 장면',
+    '예수님의 성찬식 베푸시는 장면',
+    '요셉이 애굽에서 형들을 용서하는 장면',
+  ],
+}
+
+/* ══════════════════════════════════════════════════
+   BINGO DATA (existing)
+══════════════════════════════════════════════════ */
+const BINGO_CATEGORIES = [
+  { id:'bible', name:'성경', emoji:'📖', gradient:'linear-gradient(135deg,#1d4ed8,#1e3a8a)', accent:'#60a5fa',
+    subjects:[
+      { id:'ot', name:'구약 인물', emoji:'📜', size:4, words:['아브라함','이삭','야곱','요셉','모세','여호수아','기드온','삼손','룻','사무엘','사울','다윗','솔로몬','엘리야','엘리사','이사야','예레미야','다니엘','에스더','느헤미야'] },
+      { id:'nt', name:'신약 인물', emoji:'✝️', size:4, words:['베드로','요한','야고보','마태','안드레아','빌립','바돌로매','도마','마가','누가','바울','바나바','스데반','막달라마리아','삭개오','니고데모','시므온','아나니아','아볼로','디도'] },
+      { id:'12d', name:'12제자', emoji:'👥', size:3, words:['베드로','안드레아','야고보','요한','빌립','바돌로매','마태','도마','알패오의야고보','다대오','시몬','가룟유다'] },
+      { id:'fruit', name:'성령의 열매', emoji:'🍇', size:3, words:['사랑','희락','화평','오래참음','자비','양선','충성','온유','절제'] },
+    ]
+  },
+  { id:'church', name:'교회/신앙', emoji:'⛪', gradient:'linear-gradient(135deg,#7c3aed,#4c1d95)', accent:'#a78bfa',
+    subjects:[
+      { id:'worship', name:'예배', emoji:'🙏', size:4, words:['기도','찬양','말씀','헌금','봉사','교제','전도','선교','세례','성찬','예배','경배','묵상','회개','감사','용서','사랑','소망','믿음','은혜'] },
+      { id:'faith', name:'믿음', emoji:'✨', size:3, words:['믿음','소망','사랑','은혜','구원','기도','말씀','성령','천국','예수','십자가','부활','영생','화해','평화'] },
+    ]
+  },
+  { id:'nature', name:'자연/동물', emoji:'🌿', gradient:'linear-gradient(135deg,#059669,#065f46)', accent:'#34d399',
+    subjects:[
+      { id:'animals', name:'동물', emoji:'🐾', size:4, words:['사자','양','독수리','뱀','비둘기','물고기','염소','소','나귀','낙타','여우','곰','사슴','개','고양이','토끼','호랑이','원숭이','코끼리','기린'] },
+      { id:'nature2', name:'자연', emoji:'🌳', size:3, words:['산','강','바다','하늘','땅','빛','어둠','바람','비','눈','구름','달','해','별','풀'] },
+    ]
+  },
+  { id:'life', name:'생활', emoji:'🏠', gradient:'linear-gradient(135deg,#d97706,#92400e)', accent:'#fbbf24',
+    subjects:[
+      { id:'food', name:'음식', emoji:'🍚', size:4, words:['밥','국','김치','불고기','비빔밥','삼겹살','떡볶이','냉면','된장국','갈비','짜장면','라면','피자','햄버거','치킨','샐러드','과일','야채','빵','케이크'] },
+      { id:'school', name:'학교', emoji:'📚', size:3, words:['공부','책','연필','지우개','교실','선생님','친구','시험','숙제','수업','칠판','가방','도서관','체육관','운동장'] },
+    ]
+  }
+]
+
+const CHOSUNG_SETS = [
+  { name:'2글자 단어', emoji:'✌️', words:[
+    {q:'ㅅㄹ',a:'사랑'},{q:'ㅇㅎ',a:'은혜'},{q:'ㄱㅂ',a:'기쁨'},{q:'ㅁㅇ',a:'믿음'},
+    {q:'ㅍㅎ',a:'평화'},{q:'ㄱㄷ',a:'기도'},{q:'ㅊㅇ',a:'찬양'},{q:'ㅂㅎ',a:'부활'},
+    {q:'ㄱㅇ',a:'구원'},{q:'ㅅㅁ',a:'소망'},{q:'ㅂㅅ',a:'봉사'},{q:'ㅈㄷ',a:'전도'} ]},
+  { name:'3글자 단어', emoji:'🔤', words:[
+    {q:'ㅎㄴㄴ',a:'하나님'},{q:'ㅇㅅㄴ',a:'예수님'},{q:'ㅅㄹㄴ',a:'성령님'},{q:'ㅅㅈㄱ',a:'십자가'},
+    {q:'ㅂㅇㅈ',a:'복음서'},{q:'ㅂㅈㄱ',a:'부지런'},{q:'ㅎㄹㅈ',a:'할렐루야',note:'4글자 정답'} ]},
+  { name:'성경 책', emoji:'📖', words:[
+    {q:'ㅊㅅㄱ',a:'창세기'},{q:'ㅊㅇㄱㄱ',a:'출애굽기'},{q:'ㅅㅍ',a:'시편'},{q:'ㅈㅇ',a:'잠언'},
+    {q:'ㅇㅅㅇ',a:'이사야'},{q:'ㅁㅌㅂㅇ',a:'마태복음'},{q:'ㅇㅎㅂㅇ',a:'요한복음'},{q:'ㄹㅁㅅ',a:'로마서'},
+    {q:'ㄱㄹㄷㅈㅅ',a:'고린도전서'},{q:'ㅎㅂㄹㅅ',a:'히브리서'},{q:'ㅇㄱㅂㅅ',a:'야고보서'},{q:'ㄱㅅㄹ',a:'계시록'} ]},
+]
+
+const RELAY_THEMES = [
+  { name:'예수님의 12제자', emoji:'👥', accent:'#60a5fa', words:['베드로','안드레아','야고보','요한','빌립','바돌로매','마태','도마','알패오의 야고보','다대오','시몬','가룟 유다'] },
+  { name:'이스라엘 12지파', emoji:'🏛️', accent:'#a78bfa', words:['르우벤','시므온','레위','유다','단','납달리','갓','아셀','잇사갈','스불론','요셉','베냐민'] },
+  { name:'성령의 열매 (9가지)', emoji:'🍇', accent:'#34d399', words:['사랑','희락','화평','오래참음','자비','양선','충성','온유','절제'] },
+  { name:'십계명', emoji:'📜', accent:'#fb923c', words:['1.다른 신을 두지 말라','2.우상을 만들지 말라','3.이름을 망령되이 부르지 말라','4.안식일을 거룩히 지키라','5.부모를 공경하라','6.살인하지 말라','7.간음하지 말라','8.도둑질하지 말라','9.거짓 증거하지 말라','10.탐내지 말라'] },
+  { name:'창조의 7일', emoji:'🌍', accent:'#22d3ee', words:['첫째날: 빛','둘째날: 궁창','셋째날: 육지와 식물','넷째날: 해/달/별','다섯째날: 새와 물고기','여섯째날: 동물과 사람','일곱째날: 안식'] },
+  { name:'5권의 모세오경', emoji:'📖', accent:'#fcd34d', words:['창세기','출애굽기','레위기','민수기','신명기'] },
+]
+
+const SENTENCE_SETS = {
+  bible: { name:'성경 구절',
+    easy:[
+      { front:'하나님이 세상을 이처럼 사랑하사', back:'독생자를 주셨으니', ref:'요 3:16' },
+      { front:'내가 너희에게 평안을 끼치노니', back:'나의 평안을 너희에게 주노라', ref:'요 14:27' },
+      { front:'강하고 담대하라 두려워하지 말며', back:'놀라지 말라 네 하나님 여호와가 함께 하느니라', ref:'수 1:9' },
+      { front:'주의 말씀은 내 발에 등이요', back:'내 길에 빛이니이다', ref:'시 119:105' },
+      { front:'여호와를 경외하는 것이 지식의 근본이거늘', back:'미련한 자는 지혜와 훈계를 멸시하느니라', ref:'잠 1:7' },
+      { front:'범사에 감사하라 이것이 그리스도 예수 안에서', back:'너희를 향하신 하나님의 뜻이니라', ref:'살전 5:18' },
+      { front:'예수께서 이르시되 내가 길이요', back:'진리요 생명이니', ref:'요 14:6' },
+      { front:'항상 기뻐하라 쉬지 말고 기도하라', back:'범사에 감사하라', ref:'살전 5:16-18' },
+      { front:'두 세 사람이 내 이름으로 모인 곳에는', back:'나도 그들 중에 있느니라', ref:'마 18:20' },
+      { front:'수고하고 무거운 짐 진 자들아 다 내게로 오라', back:'내가 너희를 쉬게 하리라', ref:'마 11:28' },
+    ],
+    hard:[
+      { front:'내가 달려갈 길과 주 예수께 받은 사명', back:'하나님의 은혜의 복음을 증언하는 일을 마치려 함에는', ref:'행 20:24' },
+      { front:'그런즉 믿음 소망 사랑 이 세 가지는 항상 있을 것인데', back:'그 중의 제일은 사랑이라', ref:'고전 13:13' },
+    ]
+  },
+  proverb: { name:'속담',
+    easy:[
+      { front:'가는 말이 고와야', back:'오는 말이 곱다', ref:'속담' },
+      { front:'가랑비에', back:'옷 젖는 줄 모른다', ref:'속담' },
+      { front:'고생 끝에', back:'낙이 온다', ref:'속담' },
+      { front:'구슬이 서 말이라도', back:'꿰어야 보배', ref:'속담' },
+      { front:'낮 말은 새가 듣고', back:'밤 말은 쥐가 듣는다', ref:'속담' },
+      { front:'돌다리도', back:'두드려 보고 건너라', ref:'속담' },
+      { front:'백지장도', back:'맞들면 낫다', ref:'속담' },
+      { front:'세 살 버릇이', back:'여든까지 간다', ref:'속담' },
+      { front:'티끌 모아', back:'태산', ref:'속담' },
+      { front:'하늘이 무너져도', back:'솟아날 구멍이 있다', ref:'속담' },
+    ],
+    hard:[
+      { front:'천 리 길도', back:'한 걸음부터', ref:'속담' },
+      { front:'콩 심은 데 콩 나고', back:'팥 심은 데 팥 난다', ref:'속담' },
+    ]
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ROUTING + UTILITY
+══════════════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  const el = document.getElementById('page-' + id)
+  if (el) { el.classList.add('active'); el.classList.add('fade-in'); window.scrollTo(0,0) }
+}
+function goHome() { showPage('home') }
+function toggleHowto(btn) {
+  const body = btn.nextElementSibling
+  body.classList.toggle('open')
+  btn.querySelector('span').textContent = body.classList.contains('open') ? '▴' : '▾'
+}
+function shuffle(arr) {
+  const a = [...arr]
+  for (let i=a.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]
+  }
+  return a
+}
+
+/* ══════════════════════════════════════════════════
+   HOME INIT
+══════════════════════════════════════════════════ */
+function initHome() {
+  document.getElementById('games-grid').innerHTML = GAMES.map(g => `
+    <button class="game-card" onclick="showPage('${g.page}')"
+      style="background:${g.gradient};box-shadow:0 6px 20px ${g.accent}44;border:1px solid ${g.accent}55;">
+      ${g.isNew ? '<span class="badge-new">NEW</span>' : ''}
+      <span class="emoji">${g.emoji}</span>
+      <span class="name">${g.name}</span>
+    </button>
+  `).join('')
+}
+initHome()
+
+/* ══════════════════════════════════════════════════
+   STOPWATCH
+══════════════════════════════════════════════════ */
+let swRunning=false, swTime=0, swInterval=null, swStart=0, swSaved=0
+function swFormat(ms) {
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), cs=Math.floor((ms%1000)/10)
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}:${String(cs).padStart(2,'0')}`
+}
+function swToggle() {
+  const btn=document.getElementById('sw-btn'), display=document.getElementById('sw-display')
+  if(!swRunning){
+    swRunning=true; swStart=Date.now()-swSaved
+    swInterval=setInterval(()=>{ swTime=Date.now()-swStart; display.textContent=swFormat(swTime); display.style.color='#22d3ee'; display.style.textShadow='0 0 40px rgba(34,211,238,0.4)' },16)
+    btn.textContent='정지'; btn.className='btn btn-danger btn-lg'
+  } else {
+    swRunning=false; clearInterval(swInterval); swSaved=swTime
+    btn.textContent='시작'; btn.className='btn btn-primary btn-lg'
+    display.style.color='#f97316'; display.style.textShadow='0 0 30px rgba(249,115,22,0.3)'
+  }
+}
+function swReset() {
+  swRunning=false; clearInterval(swInterval); swTime=0; swSaved=0
+  const d=document.getElementById('sw-display'); d.textContent='00:00:00'; d.style.color='#f8fafc'; d.style.textShadow='none'
+  const b=document.getElementById('sw-btn'); b.textContent='시작'; b.className='btn btn-primary btn-lg'
+}
+
+/* ══════════════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════════════ */
+const TIMER_PRESETS=[{label:'10초',secs:10},{label:'30초',secs:30},{label:'1분',secs:60},{label:'2분',secs:120},{label:'3분',secs:180},{label:'5분',secs:300},{label:'10분',secs:600}]
+let timerTotal=60, timerRemain=60, timerRunning=false, timerDone=false, timerInterval=null
+function initTimerPresets() {
+  document.getElementById('timer-presets').innerHTML = TIMER_PRESETS.map(p =>
+    `<button class="preset-btn${timerTotal===p.secs?' active':''}" onclick="selectPreset(${p.secs})">${p.label}</button>`).join('')
+}
+function selectPreset(secs) {
+  clearInterval(timerInterval); timerRunning=false; timerDone=false; timerTotal=secs; timerRemain=secs
+  document.getElementById('timer-custom').value=''; updateTimerUI(); initTimerPresets()
+  const b=document.getElementById('timer-btn'); b.textContent='시작'; b.style.cssText='background:linear-gradient(135deg,#0891b2,#1d4ed8);color:#fff;'
+}
+function applyCustomTimer() {
+  const v=parseInt(document.getElementById('timer-custom').value); if(!v||v<1)return; selectPreset(v)
+}
+function updateTimerUI() {
+  const arc=document.getElementById('timer-arc'), num=document.getElementById('timer-num'), sub=document.getElementById('timer-sub')
+  const ratio=timerTotal>0?timerRemain/timerTotal:0, circ=2*Math.PI*115
+  arc.style.strokeDashoffset = circ*(1-ratio)
+  const color = timerDone?'#ef4444' : ratio>0.5?'#38bdf8' : ratio>0.2?'#fbbf24' : '#f97316'
+  arc.style.stroke=color; arc.style.filter=`drop-shadow(0 0 8px ${color}66)`
+  if(timerDone){ num.textContent='종료!'; num.style.color='#ef4444'; sub.textContent='' }
+  else {
+    const m=Math.floor(timerRemain/60), s=timerRemain%60
+    num.textContent = timerTotal>=60 ? `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : String(timerRemain).padStart(2,'0')
+    num.style.color=color; sub.textContent = timerRemain>0?`${timerRemain}초 남음`:''
+  }
+}
+function timerToggle() {
+  if(timerDone)return
+  const btn=document.getElementById('timer-btn')
+  if(!timerRunning){
+    timerRunning=true
+    timerInterval=setInterval(()=>{
+      timerRemain--
+      if(timerRemain<=0){
+        clearInterval(timerInterval); timerRunning=false; timerDone=true; timerRemain=0
+        btn.textContent='종료'; btn.style.cssText='background:rgba(239,68,68,0.15);color:#ef4444;'
+        document.getElementById('page-timer').style.background='linear-gradient(160deg,#1a0505,#2d0a0a)'
+      }
+      updateTimerUI()
+    },1000)
+    btn.textContent='일시정지'; btn.style.cssText='background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.35);'
+  } else {
+    timerRunning=false; clearInterval(timerInterval)
+    btn.textContent='시작'; btn.style.cssText='background:linear-gradient(135deg,#0891b2,#1d4ed8);color:#fff;'
+  }
+}
+function timerReset() {
+  clearInterval(timerInterval); timerRunning=false; timerDone=false; timerRemain=timerTotal
+  document.getElementById('page-timer').style.background=''
+  const b=document.getElementById('timer-btn'); b.textContent='시작'; b.style.cssText='background:linear-gradient(135deg,#0891b2,#1d4ed8);color:#fff;'
+  updateTimerUI()
+}
+initTimerPresets(); updateTimerUI()
+
+/* ══════════════════════════════════════════════════
+   DICE
+══════════════════════════════════════════════════ */
+const DOT_POS={1:[[2,2]],2:[[1,1],[3,3]],3:[[1,1],[2,2],[3,3]],4:[[1,1],[3,1],[1,3],[3,3]],5:[[1,1],[3,1],[2,2],[1,3],[3,3]],6:[[1,1],[3,1],[1,2],[3,2],[1,3],[3,3]]}
+const YUT_INFO={'도':{steps:1,again:false,color:'#94a3b8',emoji:'🐖',desc:'돼지 · 1칸'},'개':{steps:2,again:false,color:'#a5b4fc',emoji:'🐕',desc:'개 · 2칸'},'걸':{steps:3,again:false,color:'#fbbf24',emoji:'🐑',desc:'양 · 3칸'},'윷':{steps:4,again:true,color:'#f87171',emoji:'🐄',desc:'소 · 4칸 · 한 번 더!'},'모':{steps:5,again:true,color:'#a78bfa',emoji:'🐎',desc:'말 · 5칸 · 한 번 더!'}}
+let diceMode='dice', diceCount=1, diceRolling=false
+let diceValues=[1], yutSticks=[true,true,true,true], yutName=null
+let diceRollInterval=null, diceRollTimeout=null
+
+function renderDie(v) {
+  const dots=DOT_POS[v]||[]
+  let cells=''
+  for(let r=1;r<=3;r++) for(let c=1;c<=3;c++){
+    const has = dots.some(([dc,dr]) => dc===c && dr===r)
+    cells += `<div class="die-cell">${has?'<div class="dot"></div>':''}</div>`
+  }
+  return `<div class="die${diceRolling?' rolling':''}">${cells}</div>`
+}
+function renderDice() {
+  const faces=document.getElementById('dice-faces')
+  if(diceMode==='dice'){
+    faces.style.flexDirection='row'
+    faces.innerHTML = diceValues.slice(0,diceCount).map(v=>renderDie(v)).join('')
+  } else {
+    faces.style.flexDirection='column'
+    faces.innerHTML = `<div class="yut-sticks">${yutSticks.map(flat=>
+      `<div class="yut-stick ${flat?'flat':'round'}${diceRolling?' rolling':''}">${flat?'◇ 평평한 면 (앞)':'● 둥근 면 (뒤)'}</div>`).join('')}</div>`
+  }
+}
+function renderDiceResult() {
+  const res=document.getElementById('dice-result')
+  if(diceRolling){ res.innerHTML=''; return }
+  if(diceMode==='dice'){
+    if(diceCount===2){
+      const sum=diceValues[0]+diceValues[1]
+      res.innerHTML = `<p class="section-label">합계</p><div class="sum-num">${sum}</div>`
+    } else res.innerHTML=''
+  } else if(yutName){
+    const info=YUT_INFO[yutName]
+    res.innerHTML = `<div class="yut-result">
+      <div style="font-size:48px;">${info.emoji}</div>
+      <div class="yut-name" style="color:${info.color};">${yutName}</div>
+      <div class="yut-desc">${info.desc}</div>
+      ${info.again?'<div style="margin-top:12px;padding:8px 20px;border-radius:20px;display:inline-block;background:rgba(251,191,36,0.15);color:#fbbf24;font-weight:800;font-size:15px;">✨ 한 번 더 던지세요!</div>':''}
+    </div>`
+  }
+}
+function setDiceMode(m) {
+  if(diceRolling)return
+  diceMode=m; yutName=null
+  document.querySelectorAll('#dice-mode-tabs .pill-tab').forEach((b,i)=>b.classList.toggle('active',(m==='dice'&&i===0)||(m==='yut'&&i===1)))
+  document.getElementById('dice-count-row').style.display = m==='dice'?'grid':'none'
+  document.getElementById('dice-title').textContent = m==='dice'?'🎲 주사위 굴리기':'🎴 윷놀이'
+  const btn=document.getElementById('dice-roll-btn')
+  btn.textContent = m==='dice'?'🎲 굴리기!':'🎴 던지기!'
+  btn.style.background = m==='dice'?'linear-gradient(135deg,#dc2626,#9a3412)':'linear-gradient(135deg,#d97706,#92400e)'
+  renderDice(); renderDiceResult()
+}
+function setDiceCount(n) {
+  if(diceRolling)return
+  diceCount=n
+  document.querySelectorAll('#dice-count-row .pill-tab').forEach((b,i)=>b.classList.toggle('active',i===n-1))
+  renderDice(); renderDiceResult()
+}
+function rollDice() {
+  if(diceRolling)return
+  clearInterval(diceRollInterval); clearTimeout(diceRollTimeout)
+  diceRolling=true; yutName=null
+  document.getElementById('dice-result').innerHTML=''
+  const btn=document.getElementById('dice-roll-btn')
+  btn.textContent='✦ 굴리는 중…'; btn.style.opacity='0.7'
+  diceRollInterval = setInterval(()=>{
+    if(diceMode==='dice') diceValues=Array.from({length:diceCount},()=>Math.floor(Math.random()*6)+1)
+    else yutSticks=Array.from({length:4},()=>Math.random()<0.5)
+    renderDice()
+  },60)
+  diceRollTimeout = setTimeout(()=>{
+    clearInterval(diceRollInterval)
+    if(diceMode==='dice') diceValues=Array.from({length:diceCount},()=>Math.floor(Math.random()*6)+1)
+    else {
+      yutSticks=Array.from({length:4},()=>Math.random()<0.5)
+      const flat = yutSticks.filter(s=>s).length
+      yutName = ({1:'도',2:'개',3:'걸',4:'윷',0:'모'})[flat]
+    }
+    diceRolling=false
+    renderDice(); renderDiceResult()
+    btn.textContent = diceMode==='dice'?'🎲 굴리기!':'🎴 던지기!'; btn.style.opacity='1'
+  },1500)
+}
+renderDice()
+
+/* ══════════════════════════════════════════════════
+   BINGO
+══════════════════════════════════════════════════ */
+let bingoMode='cat', bingoCategory=null, bingoTheme=null, bingoPool=[], bingoCalled=[]
+function bingoBack() {
+  if(bingoMode==='play'){bingoMode='subject';renderBingo()}
+  else if(bingoMode==='subject'){bingoMode='cat';bingoCategory=null;renderBingo()}
+  else goHome()
+}
+function renderBingo() {
+  const c=document.getElementById('bingo-content'), title=document.getElementById('bingo-title'), prog=document.getElementById('bingo-progress-label')
+  if(bingoMode==='cat'){
+    title.textContent='🎯 빙고 게임'; prog.textContent=''
+    c.innerHTML=`
+      <div class="verse-banner"><p>"푯대를 향하여 그리스도 예수 안에서 하나님이 위에서 부르신 부름의 상을 위하여 달려가노라"</p><span>빌 3:14</span></div>
+      <p class="section-label" style="margin-top:4px;">분류 선택</p>
+      <div class="bingo-cats">${BINGO_CATEGORIES.map(cat=>`
+        <button class="cat-card" onclick="bingoSelectCat('${cat.id}')"
+          style="background:${cat.gradient};box-shadow:0 6px 20px ${cat.accent}33;border:1px solid ${cat.accent}55;">
+          <span class="emoji">${cat.emoji}</span><span class="label-text">${cat.name}</span>
+          <span class="count">주제 ${cat.subjects.length}종</span>
+        </button>`).join('')}</div>`
+  } else if(bingoMode==='subject'){
+    title.textContent=`${bingoCategory.emoji} ${bingoCategory.name}`; prog.textContent=''
+    c.innerHTML=`
+      <p class="section-label">세부 주제 선택</p>
+      <div class="bingo-subjects">${bingoCategory.subjects.map(s=>`
+        <button class="subject-card" onclick="bingoStartGame('${s.id}')"
+          style="background:${bingoCategory.gradient};box-shadow:0 6px 20px ${bingoCategory.accent}33;border:1px solid ${bingoCategory.accent}55;">
+          <span class="size-badge">${s.size}×${s.size}</span>
+          <span class="emoji">${s.emoji}</span><span class="label-text">${s.name}</span>
+          <span class="word-count">단어 ${s.words.length}개</span>
+        </button>`).join('')}</div>`
+  } else if(bingoMode==='play'){
+    const current=bingoCalled[bingoCalled.length-1]
+    const remaining=bingoPool.length-bingoCalled.length
+    const progress=bingoCalled.length/bingoPool.length*100
+    const sz=`${bingoTheme.size}×${bingoTheme.size}`
+    title.textContent=`${bingoTheme.name} · ${sz}`
+    prog.textContent=`${bingoCalled.length} / ${bingoPool.length}`
+    const fs = current ? (current.length>5?48:current.length>3?64:80) : 48
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 16px;"><div class="progress-bar" style="width:${progress}%;background:${bingoCategory.gradient};"></div></div>
+      <div class="bingo-play">
+        <div class="bingo-word-wrap">
+          ${current?`
+            <p class="section-label">호명 단어</p>
+            <div class="bingo-word" style="font-size:${fs}px;color:${bingoCategory.accent};text-shadow:0 0 30px ${bingoCategory.accent}88;">${current}</div>
+          `:`
+            <div style="font-size:48px;margin-bottom:16px;">📋</div>
+            <p style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:8px;">학생들이 빙고판을 채울 시간을 주세요</p>
+            <p class="text-sm text-muted" style="line-height:1.7;">주제: <strong style="color:${bingoCategory.accent};">${bingoTheme.name}</strong><br>빙고판: ${sz} · 단어 ${bingoPool.length}개<br>준비되면 <strong>"시작!"</strong></p>
+          `}
+        </div>
+        ${bingoCalled.length>1?`
+          <p class="section-label" style="padding:0 18px;margin-bottom:8px;">지금까지 (${bingoCalled.length-1}개)</p>
+          <div class="called-chips">${bingoCalled.slice(0,-1).map(w=>`<span class="called-chip" style="background:${bingoCategory.accent}1f;color:${bingoCategory.accent};border:1px solid ${bingoCategory.accent}44;">${w}</span>`).join('')}</div>
+        `:''}
+      </div>
+      <div style="padding:0 0 28px;display:flex;flex-direction:column;gap:10px;">
+        ${remaining>0?`
+          <button class="btn btn-full btn-lg" onclick="bingoNext()"
+            style="background:${bingoCategory.gradient};color:#fff;box-shadow:0 8px 32px ${bingoCategory.accent}55;">
+            🎯 ${bingoCalled.length===0?'시작!':'다음 단어'}</button>`:`
+          <div style="padding:16px;border-radius:16px;text-align:center;background:${bingoCategory.accent}1a;border:1px solid ${bingoCategory.accent}55;">
+            <p style="font-weight:800;font-size:16px;color:${bingoCategory.accent};">✓ 모든 단어 호명 완료</p></div>`}
+        <button class="btn btn-ghost btn-full" onclick="bingoReshuffle()">🔁 다시 셔플하고 시작</button>
+      </div>`
+  }
+}
+function bingoSelectCat(id){ bingoCategory=BINGO_CATEGORIES.find(c=>c.id===id); bingoMode='subject'; renderBingo() }
+function bingoStartGame(sid){ bingoTheme=bingoCategory.subjects.find(s=>s.id===sid); bingoPool=shuffle(bingoTheme.words); bingoCalled=[]; bingoMode='play'; renderBingo() }
+function bingoNext(){ if(bingoCalled.length<bingoPool.length){ bingoCalled.push(bingoPool[bingoCalled.length]); renderBingo() }}
+function bingoReshuffle(){ bingoPool=shuffle(bingoTheme.words); bingoCalled=[]; renderBingo() }
+renderBingo()
+
+/* ══════════════════════════════════════════════════
+   CHOSUNG
+══════════════════════════════════════════════════ */
+let chosungMode='cat', chosungSet=null, chosungIdx=0
+let chosungScore={correct:0,wrong:0}, chosungRevealed=false
+function chosungBack(){ if(chosungMode==='play'||chosungMode==='result'){chosungMode='cat';renderChosung()} else goHome() }
+function renderChosung() {
+  const c=document.getElementById('chosung-content'), title=document.getElementById('chosung-title')
+  if(chosungMode==='cat'){
+    title.textContent='🔤 초성 게임'
+    c.innerHTML=`
+      <div class="verse-banner"><p>"주의 말씀은 내 발에 등이요 내 길에 빛이니이다"</p><span>시 119:105</span></div>
+      <p class="section-label">카테고리 선택</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">${CHOSUNG_SETS.map((s,i)=>`
+        <button class="theme-card" onclick="chosungStart(${i})">
+          <span class="emoji">${s.emoji}</span><div class="tname">${s.name}</div>
+          <div class="tcount">문제 ${s.words.length}개</div>
+        </button>`).join('')}</div>`
+  } else if(chosungMode==='play'){
+    const set=chosungSet, item=set.words[chosungIdx], total=set.words.length
+    title.textContent=set.name
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 14px;"><div class="progress-bar" style="width:${chosungIdx/total*100}%;background:linear-gradient(135deg,#10b981,#059669);"></div></div>
+      <p class="section-label" style="text-align:center;margin:8px 0 6px;">${chosungIdx+1} / ${total}</p>
+      <div class="quiz-display">
+        <div class="chosung-text">${item.q}</div>
+        ${chosungRevealed?`
+          <div class="answer-reveal">${item.a}</div>
+          ${item.note?`<p class="text-sm text-muted">${item.note}</p>`:''}
+        `:`<button class="btn btn-ghost" onclick="chosungReveal()">정답 공개</button>`}
+      </div>
+      ${chosungRevealed?`
+        <div class="btn-row" style="padding-bottom:28px;">
+          <button class="btn btn-danger" onclick="chosungNext('wrong')" style="flex:1;">❌ 패스</button>
+          <button class="btn btn-success" onclick="chosungNext('correct')" style="flex:1;">✅ 맞음</button>
+        </div>`:`<div style="padding-bottom:28px;"></div>`}`
+  } else {
+    const total=chosungSet.words.length
+    title.textContent='결과'
+    c.innerHTML=`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 0;text-align:center;">
+        <div style="font-size:64px;margin-bottom:20px;">🎉</div>
+        <p class="section-label">최종 점수</p>
+        <p style="font-size:72px;font-weight:900;color:#34d399;text-shadow:0 0 30px rgba(52,211,153,0.5);">${chosungScore.correct}</p>
+        <p style="font-size:16px;color:var(--text2);">/ ${total} 문제</p>
+        <p class="text-sm text-muted" style="margin-top:12px;">오답: ${chosungScore.wrong}개</p>
+      </div>
+      <div style="padding-bottom:28px;"><button class="btn btn-primary btn-full btn-lg" onclick="chosungMode='cat';renderChosung()">처음으로</button></div>`
+  }
+}
+function chosungStart(i){ chosungSet=CHOSUNG_SETS[i]; chosungIdx=0; chosungRevealed=false; chosungScore={correct:0,wrong:0}; chosungMode='play'; renderChosung() }
+function chosungReveal(){ chosungRevealed=true; renderChosung() }
+function chosungNext(r){
+  if(r==='correct')chosungScore.correct++; else chosungScore.wrong++
+  chosungIdx++; chosungRevealed=false
+  if(chosungIdx>=chosungSet.words.length) chosungMode='result'
+  renderChosung()
+}
+renderChosung()
+
+/* ══════════════════════════════════════════════════
+   RANDOM PICK
+══════════════════════════════════════════════════ */
+let pickNames=[], pickRemain=[], pickRolling=false, pickInterval=null
+function addName() {
+  const input=document.getElementById('name-input'), name=input.value.trim()
+  if(!name||pickNames.includes(name)){input.value='';return}
+  pickNames.push(name); pickRemain=[...pickNames]; input.value=''; renderNames()
+}
+function removeName(i){ pickNames.splice(i,1); pickRemain=[...pickNames]; renderNames() }
+function renderNames(){
+  document.getElementById('names-list').innerHTML = pickNames.map((n,i)=>`<div class="name-chip">${n}<button class="remove-btn" onclick="removeName(${i})">×</button></div>`).join('')
+}
+function toggleRoll(){
+  const btn=document.getElementById('roll-btn')
+  if(!pickRolling){
+    const pool = document.getElementById('exclude-check').checked ? pickRemain : pickNames
+    if(pool.length===0)return
+    pickRolling=true
+    document.getElementById('pick-result').innerHTML=''
+    btn.textContent='⏹ 멈춰!'; btn.style.background='linear-gradient(135deg,#dc2626,#b91c1c)'
+    pickInterval = setInterval(()=>{
+      document.getElementById('drum-name').textContent = pool[Math.floor(Math.random()*pool.length)]
+    },60)
+  } else {
+    clearInterval(pickInterval); pickRolling=false
+    const pool = document.getElementById('exclude-check').checked ? pickRemain : pickNames
+    if(pool.length===0)return
+    const result = pool[Math.floor(Math.random()*pool.length)]
+    document.getElementById('drum-name').textContent=result
+    document.getElementById('pick-result').innerHTML=`<div class="pick-result">🎉 ${result}</div>`
+    if(document.getElementById('exclude-check').checked){
+      pickRemain = pickRemain.filter(n=>n!==result)
+      if(pickRemain.length===0) pickRemain=[...pickNames]
+    }
+    btn.textContent='🎰 돌리기!'; btn.style.background='linear-gradient(135deg,#6366f1,#4f46e5)'
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   WORD RELAY
+══════════════════════════════════════════════════ */
+let relayMode='cat', relayTheme=null, relayShowPool=false
+function relayBack(){ if(relayMode==='play'){relayMode='cat';renderRelay()} else goHome() }
+function renderRelay() {
+  const c=document.getElementById('relay-content'), title=document.getElementById('relay-title')
+  if(relayMode==='cat'){
+    title.textContent='🔗 단어 릴레이'
+    c.innerHTML=`
+      <div class="verse-banner"><p>"내가 주께 범죄하지 아니하려 하여 주의 말씀을 내 마음에 두었나이다"</p><span>시 119:11</span></div>
+      <p class="section-label">주제 선택</p>
+      <div class="theme-cards">${RELAY_THEMES.map((t,i)=>`
+        <div class="theme-card" onclick="relaySelect(${i})">
+          <span class="emoji">${t.emoji}</span>
+          <div class="tname">${t.name}</div>
+          <div class="tcount">정답 ${t.words.length}개</div>
+        </div>`).join('')}</div>`
+  } else {
+    title.textContent=relayTheme.name
+    c.innerHTML=`
+      <div style="text-align:center;padding:24px 0 16px;">
+        <div style="font-size:52px;margin-bottom:12px;">${relayTheme.emoji}</div>
+        <h2 style="font-size:22px;font-weight:900;color:${relayTheme.accent};margin-bottom:6px;">${relayTheme.name}</h2>
+        <p class="text-sm text-muted">정답 ${relayTheme.words.length}개</p>
+      </div>
+      <button class="btn btn-ghost btn-full" style="margin-bottom:12px;" onclick="relayShowPool=!relayShowPool;renderRelay()">
+        ${relayShowPool?'📋 정답 숨기기':'📋 정답 보기 (진행자용)'}
+      </button>
+      ${relayShowPool?`<div class="answer-pool">${relayTheme.words.map(w=>`<span class="pool-word">${w}</span>`).join('')}</div>`:''}
+      <div class="card" style="margin-top:12px;text-align:center;">
+        <p style="font-size:15px;color:var(--text2);line-height:1.8;">
+          학생들에게 주제를 알려주세요.<br>
+          <strong style="color:${relayTheme.accent};">"${relayTheme.name}"</strong>에 해당하는<br>
+          단어를 한 명씩 차례로 외칩니다.<br>막히거나 중복하면 탈락!
+        </p>
+      </div>
+      <div style="padding:20px 0 28px;"><button class="btn btn-ghost btn-full" onclick="relayMode='cat';renderRelay()">← 주제 다시 선택</button></div>`
+  }
+}
+function relaySelect(i){ relayTheme=RELAY_THEMES[i]; relayShowPool=false; relayMode='play'; renderRelay() }
+renderRelay()
+
+/* ══════════════════════════════════════════════════
+   SENTENCE MATCH
+══════════════════════════════════════════════════ */
+let sentenceMode='cat', sentenceCat=null, sentenceDiff='easy'
+let sentenceList=[], sentenceIdx=0, sentenceRevealed=false
+function sentenceBack() {
+  if(sentenceMode==='diff'){sentenceMode='cat';renderSentence()}
+  else if(sentenceMode==='play'){sentenceMode='diff';renderSentence()}
+  else goHome()
+}
+function renderSentence() {
+  const c=document.getElementById('sentence-content'), title=document.getElementById('sentence-title')
+  if(sentenceMode==='cat'){
+    title.textContent='📜 문장 매칭'
+    c.innerHTML=`
+      <div class="verse-banner"><p>"오늘 내가 네게 명하는 이 말씀을 너는 마음에 새기고"</p><span>신 6:6</span></div>
+      <p class="section-label">카테고리</p>
+      <div class="theme-cards">${Object.entries(SENTENCE_SETS).map(([k,v])=>`
+        <div class="theme-card" onclick="sentenceCat='${k}';sentenceMode='diff';renderSentence()">
+          <span class="emoji">${k==='bible'?'📖':'💬'}</span>
+          <div class="tname">${v.name}</div>
+          <div class="tcount">${v.easy.length + v.hard.length}개</div>
+        </div>`).join('')}</div>`
+  } else if(sentenceMode==='diff'){
+    const cat=SENTENCE_SETS[sentenceCat]
+    title.textContent=cat.name
+    c.innerHTML=`
+      <p class="section-label">난이도 선택</p>
+      <div class="diff-btns">
+        <div class="diff-btn${sentenceDiff==='easy'?' selected':''}" onclick="sentenceDiff='easy';renderSentence()">쉬움 (${cat.easy.length})</div>
+        <div class="diff-btn${sentenceDiff==='hard'?' selected':''}" onclick="sentenceDiff='hard';renderSentence()">어려움 (${cat.hard.length})</div>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="sentenceStartGame()">시작</button>`
+  } else {
+    const item=sentenceList[sentenceIdx], total=sentenceList.length
+    title.textContent=`${sentenceIdx+1} / ${total}`
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 18px;"><div class="progress-bar" style="width:${sentenceIdx/total*100}%;background:linear-gradient(135deg,#0e7490,#1e40af);"></div></div>
+      <div class="sentence-card">
+        <p class="section-label">앞부분</p>
+        <p class="sentence-front">${item.front}</p>
+        ${sentenceRevealed?`
+          <p class="section-label" style="margin-top:16px;">뒷부분</p>
+          <p class="sentence-back">${item.back}</p>
+          <p class="sentence-ref">${item.ref}</p>`:''}
+      </div>
+      ${!sentenceRevealed
+        ? `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:12px;" onclick="sentenceRevealed=true;renderSentence()">정답 보기</button>`
+        : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:12px;" onclick="sentenceNext()">${sentenceIdx<total-1?'다음 →':'완료'}</button>`}
+      <div style="display:flex;gap:10px;justify-content:center;font-size:14px;color:var(--text3);">
+        <button class="btn btn-ghost" style="padding:10px 16px;font-size:13px;" onclick="sentenceIdx=Math.max(0,sentenceIdx-1);sentenceRevealed=false;renderSentence()" ${sentenceIdx===0?'disabled':''}>← 이전</button>
+        <span style="align-self:center;">${sentenceIdx+1} / ${total}</span>
+        <button class="btn btn-ghost" style="padding:10px 16px;font-size:13px;" onclick="sentenceNext()" ${sentenceIdx>=total-1?'disabled':''}>다음 →</button>
+      </div>`
+  }
+}
+function sentenceStartGame(){
+  sentenceList = shuffle(SENTENCE_SETS[sentenceCat][sentenceDiff]||SENTENCE_SETS[sentenceCat].easy)
+  sentenceIdx=0; sentenceRevealed=false; sentenceMode='play'; renderSentence()
+}
+function sentenceNext(){
+  sentenceIdx++; sentenceRevealed=false
+  if(sentenceIdx>=sentenceList.length){sentenceMode='cat';sentenceIdx=0}
+  renderSentence()
+}
+renderSentence()
+
+/* ══════════════════════════════════════════════════
+   PHOTO GUESS
+══════════════════════════════════════════════════ */
+let photoLibrary=[], photoActive=null, photoStep=0
+const PHOTO_STEPS=[0.1,1,3,6,12,22,40,65,100]
+function addPhoto(input) {
+  const file=input.files[0]; if(!file)return
+  const reader=new FileReader()
+  reader.onload=e=>{
+    const answer=prompt('이 사진의 정답(설명)을 입력하세요:')
+    if(!answer)return
+    photoLibrary.push({src:e.target.result, answer})
+    renderPhotoLibrary()
+  }
+  reader.readAsDataURL(file); input.value=''
+}
+function renderPhotoLibrary() {
+  const lib=document.getElementById('photo-library')
+  if(photoLibrary.length===0){
+    lib.innerHTML=`<div class="card" style="text-align:center;padding:28px;color:var(--text3);">
+      <div style="font-size:40px;margin-bottom:10px;">📷</div>
+      <p>사진을 추가하여 게임을 시작하세요.</p></div>`
+    return
+  }
+  lib.innerHTML=`
+    <p class="section-label">사진 목록 (${photoLibrary.length}개)</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+      ${photoLibrary.map((p,i)=>`
+        <button onclick="startPhotoGame(${i})" style="aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;border:2px solid ${photoActive?.idx===i?'var(--cyan)':'transparent'};cursor:pointer;padding:0;">
+          <img src="${p.src}" style="width:100%;height:100%;object-fit:cover;filter:blur(20px);">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:11px;font-weight:700;color:#fff;padding:3px 7px;background:rgba(0,0,0,0.6);border-radius:8px;">${p.answer.slice(0,6)}…</span>
+          </div>
+        </button>`).join('')}
+    </div>`
+}
+function startPhotoGame(i){ photoActive={...photoLibrary[i],idx:i}; photoStep=0; renderPhotoGame(); renderPhotoLibrary() }
+function renderPhotoGame() {
+  const area=document.getElementById('photo-game-area')
+  if(!photoActive){area.innerHTML='';return}
+  const pct=PHOTO_STEPS[photoStep], isLast = photoStep>=PHOTO_STEPS.length-1
+  area.innerHTML=`
+    <p class="section-label">사진 (${photoStep+1}/${PHOTO_STEPS.length} 단계 · ${pct}%)</p>
+    <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;background:#000;margin-bottom:14px;display:flex;align-items:center;justify-content:center;">
+      <img src="${photoActive.src}" style="width:${pct}%;height:${pct}%;object-fit:cover;border-radius:4px;">
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:28px;">
+      ${!isLast?`<button class="btn btn-primary btn-full" onclick="photoStep++;renderPhotoGame()">다음 단계 →</button>`:`<button class="btn btn-success btn-full" onclick="revealPhoto()">🎉 정답 공개</button>`}
+    </div>`
+}
+function revealPhoto(){
+  document.getElementById('photo-game-area').innerHTML=`
+    <div style="border-radius:16px;overflow:hidden;border:2px solid var(--cyan);margin-bottom:14px;">
+      <img src="${photoActive.src}" style="width:100%;display:block;"></div>
+    <div class="card card-accent" style="text-align:center;margin-bottom:28px;">
+      <p style="font-size:22px;font-weight:900;color:var(--cyan);">🎉 ${photoActive.answer}</p></div>`
+}
+renderPhotoLibrary()
+
+/* ══════════════════════════════════════════════════
+   WHO AM I (성경 인물 추리)
+══════════════════════════════════════════════════ */
+let whoamiMode='start', whoamiList=[], whoamiIdx=0, whoamiHintsShown=0, whoamiRevealed=false
+function whoamiBack(){ if(whoamiMode==='play'||whoamiMode==='done'){whoamiMode='start';renderWhoami()} else goHome() }
+function renderWhoami() {
+  const c=document.getElementById('whoami-content'), prog=document.getElementById('whoami-progress-label')
+  if(whoamiMode==='start'){
+    prog.textContent=''
+    c.innerHTML=`
+      <div class="verse-banner"><p>"천국 비밀의 청지기로 나타나리니"</p><span>고전 4:1</span></div>
+      <div class="howto">
+        <button class="howto-toggle" onclick="toggleHowto(this)">📖 사용법 <span>▾</span></button>
+        <div class="howto-body"><ol>
+          <li>한 인물당 5개의 힌트가 어려운 것부터 쉬운 순으로 공개됩니다.</li>
+          <li>"힌트 공개"를 한 번씩 누를 때마다 힌트가 하나씩 나옵니다.</li>
+          <li>학생들이 정답을 외치면 "정답 공개" 버튼을 누릅니다.</li>
+          <li>적은 힌트로 맞춘 팀에게 더 높은 점수를 줄 수 있습니다.</li>
+        </ol></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 0;text-align:center;">
+        <div style="font-size:80px;margin-bottom:16px;">🕵️</div>
+        <h2 style="font-size:28px;font-weight:900;color:#a78bfa;margin-bottom:8px;">내가 누구게</h2>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7;">성경 인물 ${WHOAMI_CHARACTERS.length}명<br>5개의 힌트로 누구인지 맞춰보세요!</p>
+      </div>
+      <div style="padding-bottom:28px;">
+        <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#1e3a8a,#4c1d95);" onclick="whoamiStart()">▶ 시작하기</button>
+      </div>`
+  } else if(whoamiMode==='play'){
+    const c2=whoamiList[whoamiIdx], total=whoamiList.length
+    prog.textContent=`${whoamiIdx+1} / ${total}`
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 14px;"><div class="progress-bar" style="width:${whoamiIdx/total*100}%;background:linear-gradient(135deg,#1e3a8a,#4c1d95);"></div></div>
+      <p class="section-label" style="text-align:center;">힌트 ${whoamiHintsShown} / 5</p>
+      <div class="hint-list" style="margin:14px 0;">
+        ${c2.hints.slice(0,whoamiHintsShown).map((h,i)=>`
+          <div class="hint-item"><span class="hint-num">${i+1}</span><span>${h}</span></div>
+        `).join('')}
+        ${whoamiHintsShown===0?'<p style="text-align:center;color:var(--text3);padding:32px 0;">힌트 공개 버튼을 눌러주세요</p>':''}
+      </div>
+      ${whoamiRevealed?`
+        <div class="quiz-display" style="padding:24px 0;">
+          <p class="section-label">정답</p>
+          <div class="answer-reveal" style="color:#a78bfa;text-shadow:0 0 30px rgba(167,139,250,0.5);">${c2.name}</div>
+        </div>`:''}
+      <div style="padding:14px 0 28px;display:flex;flex-direction:column;gap:10px;">
+        ${whoamiHintsShown<5 && !whoamiRevealed?`
+          <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#1e3a8a,#4c1d95);" onclick="whoamiHintsShown++;renderWhoami()">💡 힌트 ${whoamiHintsShown+1} 공개</button>`:''}
+        ${!whoamiRevealed?`
+          <button class="btn btn-success btn-full" onclick="whoamiRevealed=true;renderWhoami()">✅ 정답 공개</button>`:`
+          <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#1e3a8a,#4c1d95);" onclick="whoamiNext()">${whoamiIdx<total-1?'다음 인물 →':'완료'}</button>`}
+      </div>`
+  } else {
+    prog.textContent=''
+    c.innerHTML=`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0;text-align:center;">
+        <div style="font-size:72px;margin-bottom:20px;">🎉</div>
+        <h2 style="font-size:24px;font-weight:900;color:#a78bfa;margin-bottom:12px;">완료!</h2>
+        <p style="color:var(--text2);">${whoamiList.length}명의 인물을 모두 살펴봤습니다.</p>
+      </div>
+      <div style="padding-bottom:28px;display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#1e3a8a,#4c1d95);" onclick="whoamiStart()">🔁 다시 시작</button>
+        <button class="btn btn-ghost btn-full" onclick="goHome()">홈으로</button>
+      </div>`
+  }
+}
+function whoamiStart(){ whoamiList=shuffle(WHOAMI_CHARACTERS); whoamiIdx=0; whoamiHintsShown=0; whoamiRevealed=false; whoamiMode='play'; renderWhoami() }
+function whoamiNext(){
+  whoamiIdx++; whoamiHintsShown=0; whoamiRevealed=false
+  if(whoamiIdx>=whoamiList.length){whoamiMode='done'}
+  renderWhoami()
+}
+renderWhoami()
+
+/* ══════════════════════════════════════════════════
+   NONSENSE
+══════════════════════════════════════════════════ */
+let nonsenseMode='start', nonsenseList=[], nonsenseIdx=0, nonsenseRevealed=false, nonsenseHintShown=false
+function nonsenseBack(){ if(nonsenseMode==='play'||nonsenseMode==='done'){nonsenseMode='start';renderNonsense()} else goHome() }
+function renderNonsense() {
+  const c=document.getElementById('nonsense-content'), prog=document.getElementById('nonsense-progress-label')
+  if(nonsenseMode==='start'){
+    prog.textContent=''
+    c.innerHTML=`
+      <div class="verse-banner"><p>"마음의 즐거움은 양약이라도"</p><span>잠 17:22</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 0;text-align:center;">
+        <div style="font-size:80px;margin-bottom:16px;">🤪</div>
+        <h2 style="font-size:28px;font-weight:900;color:#f9a8d4;margin-bottom:8px;">성경 넌센스 퀴즈</h2>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7;">총 ${NONSENSE_QUIZZES.length}개의 넌센스 문제<br>웃음과 함께 즐겨보세요!</p>
+      </div>
+      <div style="padding-bottom:28px;">
+        <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#db2777,#9f1239);" onclick="nonsenseStart()">▶ 시작하기</button>
+      </div>`
+  } else if(nonsenseMode==='play'){
+    const q=nonsenseList[nonsenseIdx], total=nonsenseList.length
+    prog.textContent=`${nonsenseIdx+1} / ${total}`
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 18px;"><div class="progress-bar" style="width:${nonsenseIdx/total*100}%;background:linear-gradient(135deg,#db2777,#9f1239);"></div></div>
+      <div class="card" style="margin:14px 0;background:linear-gradient(135deg,rgba(219,39,119,0.1),rgba(159,18,57,0.05));border:1px solid rgba(249,168,212,0.3);">
+        <p class="section-label" style="color:#f9a8d4;">문제</p>
+        <p style="font-size:20px;font-weight:800;line-height:1.6;color:var(--text);">${q.question}</p>
+      </div>
+      ${nonsenseHintShown && !nonsenseRevealed?`
+        <div class="card" style="margin:14px 0;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);">
+          <p class="section-label" style="color:#fbbf24;">💡 힌트</p>
+          <p style="font-size:16px;color:var(--text2);">${q.hint}</p>
+        </div>`:''}
+      ${nonsenseRevealed?`
+        <div class="quiz-display" style="padding:24px 0;">
+          <p class="section-label">정답</p>
+          <div class="answer-reveal" style="color:#f9a8d4;text-shadow:0 0 30px rgba(249,168,212,0.5);">${q.answer}</div>
+          <p style="font-size:14px;color:var(--text2);margin-top:8px;">${q.hint}</p>
+        </div>`:''}
+      <div style="padding:14px 0 28px;display:flex;flex-direction:column;gap:10px;">
+        ${!nonsenseHintShown && !nonsenseRevealed?`<button class="btn btn-ghost btn-full" onclick="nonsenseHintShown=true;renderNonsense()">💡 힌트 보기</button>`:''}
+        ${!nonsenseRevealed?`<button class="btn btn-success btn-full" onclick="nonsenseRevealed=true;renderNonsense()">✅ 정답 공개</button>`:`
+          <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#db2777,#9f1239);" onclick="nonsenseNext()">${nonsenseIdx<total-1?'다음 문제 →':'완료'}</button>`}
+      </div>`
+  } else {
+    prog.textContent=''
+    c.innerHTML=`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0;text-align:center;">
+        <div style="font-size:72px;margin-bottom:20px;">🎉</div>
+        <h2 style="font-size:24px;font-weight:900;color:#f9a8d4;margin-bottom:12px;">즐거운 시간!</h2>
+        <p style="color:var(--text2);">모든 넌센스를 다 풀었습니다.</p>
+      </div>
+      <div style="padding-bottom:28px;">
+        <button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#db2777,#9f1239);" onclick="nonsenseStart()">🔁 다시 시작</button>
+      </div>`
+  }
+}
+function nonsenseStart(){ nonsenseList=shuffle(NONSENSE_QUIZZES); nonsenseIdx=0; nonsenseRevealed=false; nonsenseHintShown=false; nonsenseMode='play'; renderNonsense() }
+function nonsenseNext(){
+  nonsenseIdx++; nonsenseRevealed=false; nonsenseHintShown=false
+  if(nonsenseIdx>=nonsenseList.length){nonsenseMode='done'}
+  renderNonsense()
+}
+renderNonsense()
+
+/* ══════════════════════════════════════════════════
+   CHARADES (몸으로 말해요)
+══════════════════════════════════════════════════ */
+let charadesMode='cat', charadesCat=null, charadesList=[], charadesIdx=0, charadesRevealed=false
+function charadesBack(){
+  if(charadesMode==='play'||charadesMode==='done'){charadesMode='cat';renderCharades()}
+  else goHome()
+}
+function renderCharades() {
+  const c=document.getElementById('charades-content'), prog=document.getElementById('charades-progress-label')
+  if(charadesMode==='cat'){
+    prog.textContent=''
+    c.innerHTML=`
+      <div class="verse-banner"><p>"내가 약할 그 때에 강함이라"</p><span>고후 12:10</span></div>
+      <div class="howto">
+        <button class="howto-toggle" onclick="toggleHowto(this)">📖 사용법 <span>▾</span></button>
+        <div class="howto-body"><ol>
+          <li>팀에서 한 명씩 나와 제비뽑기를 합니다.</li>
+          <li>말 없이 몸짓으로만 문제를 표현합니다.</li>
+          <li>15문제를 먼저 맞추는 팀이 점수 획득!</li>
+          <li>"출제자 변경 찬스"는 5회까지 사용 가능합니다.</li>
+        </ol></div>
+      </div>
+      <p class="section-label">카테고리 선택 (각 15문제)</p>
+      <div class="theme-cards">${Object.entries(CHARADES_DATA).map(([k,v])=>`
+        <div class="theme-card" onclick="charadesStart('${k}')" style="border:1px solid ${v.accent}55;">
+          <span class="emoji">${v.emoji}</span>
+          <div class="tname" style="color:${v.accent};">${v.name}</div>
+          <div class="tcount">${v.words.length}문제</div>
+        </div>`).join('')}</div>`
+  } else if(charadesMode==='play'){
+    const item=charadesList[charadesIdx], total=charadesList.length, info=CHARADES_DATA[charadesCat]
+    prog.textContent=`${charadesIdx+1} / ${total}`
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 18px;"><div class="progress-bar" style="width:${charadesIdx/total*100}%;background:linear-gradient(135deg,${info.accent},${info.accent}88);"></div></div>
+      <p class="section-label" style="text-align:center;">${info.emoji} ${info.name} (${charadesIdx+1}/${total})</p>
+      <div class="quiz-display" style="padding:32px 0;">
+        ${charadesRevealed?`
+          <div class="charade-word" style="color:${info.accent};text-shadow:0 0 40px ${info.accent}88;font-size:${item.length>10?42:item.length>6?52:60}px;white-space:pre-line;">${item}</div>
+        `:`
+          <div style="font-size:96px;">${info.emoji}</div>
+          <p style="font-size:16px;color:var(--text2);margin-top:12px;">출제자만 보세요!</p>
+          <p class="text-sm text-muted">정답 공개 버튼을 누르면 문제가 보입니다</p>
+        `}
+      </div>
+      <div style="padding:14px 0 28px;display:flex;flex-direction:column;gap:10px;">
+        ${!charadesRevealed?`<button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,${info.accent},${info.accent}cc);color:#000;" onclick="charadesRevealed=true;renderCharades()">👀 문제 보기</button>`:`
+          <button class="btn btn-success btn-full" onclick="charadesNext()">✅ 맞춤! 다음</button>
+          <button class="btn btn-ghost btn-full" onclick="charadesNext()">패스</button>
+        `}
+      </div>`
+  } else {
+    prog.textContent=''
+    c.innerHTML=`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0;text-align:center;">
+        <div style="font-size:72px;margin-bottom:20px;">🎉</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--cyan);margin-bottom:12px;">완료!</h2>
+        <p style="color:var(--text2);">모든 문제를 다 풀었습니다.</p>
+      </div>
+      <div style="padding-bottom:28px;display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-primary btn-full btn-lg" onclick="charadesMode='cat';renderCharades()">다른 카테고리 선택</button>
+      </div>`
+  }
+}
+function charadesStart(k){ charadesCat=k; charadesList=shuffle(CHARADES_DATA[k].words); charadesIdx=0; charadesRevealed=false; charadesMode='play'; renderCharades() }
+function charadesNext(){
+  charadesIdx++; charadesRevealed=false
+  if(charadesIdx>=charadesList.length){charadesMode='done'}
+  renderCharades()
+}
+renderCharades()
+
+/* ══════════════════════════════════════════════════
+   BIBLE SCENES
+══════════════════════════════════════════════════ */
+let scenesMode='team', scenesTeam=null, scenesIdx=0, scenesRevealed=false
+function scenesBack(){
+  if(scenesMode==='play'){scenesMode='team';renderScenes()}
+  else goHome()
+}
+function renderScenes() {
+  const c=document.getElementById('scenes-content'), prog=document.getElementById('scenes-progress-label')
+  if(scenesMode==='team'){
+    prog.textContent=''
+    c.innerHTML=`
+      <div class="verse-banner"><p>"이 모든 일이 그들에게 본보기로 일어났고"</p><span>고전 10:11</span></div>
+      <div class="howto">
+        <button class="howto-toggle" onclick="toggleHowto(this)">📖 사용법 <span>▾</span></button>
+        <div class="howto-body"><ol>
+          <li>팀별로 5개의 성경 장면이 주어집니다.</li>
+          <li>팀원들이 협력하여 장면을 몸짓·표정·소품으로 재현합니다.</li>
+          <li>다른 팀이 어떤 장면인지 맞춥니다.</li>
+          <li>맞춘 장면 수로 점수를 매깁니다.</li>
+        </ol></div>
+      </div>
+      <p class="section-label">팀 선택</p>
+      <div class="theme-cards">${['team1','team2','team3','team4'].map((t,i)=>`
+        <div class="theme-card" onclick="scenesStart('${t}')" style="border:1px solid #5eead455;">
+          <span class="emoji">🎭</span>
+          <div class="tname" style="color:#5eead4;">${i+1}팀</div>
+          <div class="tcount">장면 ${BIBLE_SCENES[t].length}개</div>
+        </div>`).join('')}</div>`
+  } else if(scenesMode==='play'){
+    const list=BIBLE_SCENES[scenesTeam], scene=list[scenesIdx], total=list.length
+    prog.textContent=`${scenesIdx+1} / ${total}`
+    c.innerHTML=`
+      <div class="progress-wrap" style="margin:8px 0 18px;"><div class="progress-bar" style="width:${scenesIdx/total*100}%;background:linear-gradient(135deg,#0d9488,#134e4a);"></div></div>
+      <p class="section-label" style="text-align:center;">${scenesTeam.replace('team','')}팀 · 장면 ${scenesIdx+1}</p>
+      <div class="quiz-display" style="padding:32px 16px;">
+        ${scenesRevealed?`
+          <div class="scene-text">${scene}</div>
+        `:`
+          <div style="font-size:96px;">🎭</div>
+          <p style="font-size:16px;color:var(--text2);margin-top:12px;">팀원에게만 보여주세요!</p>
+          <p class="text-sm text-muted">"장면 공개"를 누르면 팀이 재현할 장면이 나옵니다</p>
+        `}
+      </div>
+      <div style="padding:14px 0 28px;display:flex;flex-direction:column;gap:10px;">
+        ${!scenesRevealed?`<button class="btn btn-primary btn-full btn-lg" style="background:linear-gradient(135deg,#0d9488,#134e4a);" onclick="scenesRevealed=true;renderScenes()">🎬 장면 공개</button>`:`
+          <button class="btn btn-success btn-full" onclick="scenesNext()">${scenesIdx<total-1?'✓ 다음 장면 →':'✓ 완료'}</button>
+        `}
+        <button class="btn btn-ghost btn-full" onclick="scenesMode='team';renderScenes()">← 팀 변경</button>
+      </div>`
+  }
+}
+function scenesStart(t){ scenesTeam=t; scenesIdx=0; scenesRevealed=false; scenesMode='play'; renderScenes() }
+function scenesNext(){
+  scenesIdx++; scenesRevealed=false
+  if(scenesIdx>=BIBLE_SCENES[scenesTeam].length){scenesMode='team'}
+  renderScenes()
+}
+renderScenes()
+
+/* ══════════════════════════════════════════════════
+   ROULETTE
+══════════════════════════════════════════════════ */
+let rouletteItems=['발표','청소','노래','기도','간식','후식','기타']
+let rouletteAngle=0, rouletteSpinning=false
+let rouletteRAF=null, rouletteTickTimer=null
+
+function renderRouletteWheel() {
+  const svg = document.getElementById('roulette-svg')
+  if(rouletteItems.length===0){ svg.innerHTML=''; return }
+  const cx=150, cy=150, r=140
+  const colors=['#ef4444','#fbbf24','#10b981','#0891b2','#6366f1','#a855f7','#ec4899','#f97316']
+  let html=''
+  const step = 360 / rouletteItems.length
+  rouletteItems.forEach((item,i)=>{
+    const startAng = i * step - 90
+    const endAng = (i+1) * step - 90
+    const startRad = startAng * Math.PI / 180
+    const endRad = endAng * Math.PI / 180
+    const x1 = cx + r * Math.cos(startRad), y1 = cy + r * Math.sin(startRad)
+    const x2 = cx + r * Math.cos(endRad),   y2 = cy + r * Math.sin(endRad)
+    const largeArc = step > 180 ? 1 : 0
+    html += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${colors[i%colors.length]}" stroke="#fff" stroke-width="2"/>`
+    const midRad = (startRad + endRad) / 2
+    const tx = cx + (r*0.65) * Math.cos(midRad)
+    const ty = cy + (r*0.65) * Math.sin(midRad)
+    const rot = (startAng + endAng) / 2 + 90
+    html += `<text x="${tx}" y="${ty}" fill="#fff" font-size="${Math.max(10,Math.min(16,140/rouletteItems.length))}" font-weight="900" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot} ${tx} ${ty})">${item}</text>`
+  })
+  // Outer ring with tick marks
+  html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#fff" stroke-width="3"/>`
+  html += `<circle cx="${cx}" cy="${cy}" r="${r-6}" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`
+  svg.innerHTML = html
+  svg.style.transform = `rotate(${rouletteAngle}deg)`
+}
+function renderRouletteItems() {
+  document.getElementById('roulette-items').innerHTML = rouletteItems.map((it,i)=>`
+    <div class="name-chip">${it}<button class="remove-btn" onclick="removeRouletteItem(${i})">×</button></div>`).join('')
+}
+function addRouletteItem() {
+  const inp=document.getElementById('roulette-input'), v=inp.value.trim()
+  if(!v||rouletteItems.length>=8)return
+  rouletteItems.push(v); inp.value=''
+  renderRouletteWheel(); renderRouletteItems()
+}
+function removeRouletteItem(i) {
+  rouletteItems.splice(i,1)
+  renderRouletteWheel(); renderRouletteItems()
+}
+
+/* Subtle audio ticks using Web Audio (no external files) */
+let _audioCtx = null
+function playTick(volume=0.15, freq=900) {
+  try {
+    if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)()
+    const ctx = _audioCtx
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'square'
+    osc.frequency.setValueAtTime(freq, ctx.currentTime)
+    gain.gain.setValueAtTime(volume, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05)
+    osc.connect(gain); gain.connect(ctx.destination)
+    osc.start(); osc.stop(ctx.currentTime + 0.05)
+  } catch(e) {}
+}
+function playDing() {
+  try {
+    if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)()
+    const ctx = _audioCtx
+    ;[660, 880, 1100].forEach((f,i)=>{
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(f, ctx.currentTime + i*0.08)
+      gain.gain.setValueAtTime(0, ctx.currentTime + i*0.08)
+      gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + i*0.08 + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.08 + 0.4)
+      osc.connect(gain); gain.connect(ctx.destination)
+      osc.start(ctx.currentTime + i*0.08); osc.stop(ctx.currentTime + i*0.08 + 0.4)
+    })
+  } catch(e) {}
+}
+
+function spinRoulette() {
+  if(rouletteSpinning||rouletteItems.length<2)return
+  rouletteSpinning=true
+  cancelAnimationFrame(rouletteRAF)
+
+  const resultEl = document.getElementById('roulette-result')
+  const pointer  = document.getElementById('roulette-pointer')
+  const center   = document.getElementById('roulette-center')
+  const svg      = document.getElementById('roulette-svg')
+
+  resultEl.innerHTML = '<span class="roulette-status">✦ 돌리는 중 ✦</span>'
+  center.classList.add('spinning')
+  center.textContent = '...'
+
+  const startAngle = rouletteAngle
+  // Total rotation: 8-10 full turns + random offset (longer for more suspense)
+  const totalRot = (8 + Math.random()*2) * 360 + Math.floor(Math.random()*360)
+  const targetAngle = startAngle + totalRot
+  const duration = 6500 // 6.5 seconds for dramatic effect
+  const startTime = performance.now()
+  const step = 360 / rouletteItems.length
+
+  // Easing: slow start, fast middle, very slow end (dramatic deceleration)
+  // Custom: combination of ease-out-quart with extra slow tail
+  const easing = t => {
+    // First 15% accelerate, rest decelerate dramatically
+    if(t < 0.15) {
+      const u = t / 0.15
+      return 0.1 * u * u
+    } else {
+      const u = (t - 0.15) / 0.85
+      // ease-out quintic for very slow end
+      return 0.1 + 0.9 * (1 - Math.pow(1 - u, 5))
+    }
+  }
+
+  let lastTickSegment = -1
+
+  function animate(now) {
+    const elapsed = now - startTime
+    const t = Math.min(elapsed / duration, 1)
+    const eased = easing(t)
+    rouletteAngle = startAngle + totalRot * eased
+    svg.style.transform = `rotate(${rouletteAngle}deg)`
+
+    // Compute current segment under pointer for ticking
+    const norm = ((rouletteAngle % 360) + 360) % 360
+    const segIdx = Math.floor(((360 - norm) % 360) / step) % rouletteItems.length
+
+    // Tick when crossing a segment boundary, more intense as we slow down
+    if(segIdx !== lastTickSegment) {
+      lastTickSegment = segIdx
+      // Pointer wobble (only after acceleration phase)
+      if(t > 0.2) {
+        pointer.classList.remove('tick')
+        // Force reflow then add class
+        void pointer.offsetWidth
+        pointer.classList.add('tick')
+        // Audio tick - frequency rises as we approach end (more anticipation)
+        const freq = 600 + (t * 600)
+        const vol = 0.06 + (t * 0.15)
+        playTick(vol, freq)
+      }
+    }
+
+    if(t < 1) {
+      rouletteRAF = requestAnimationFrame(animate)
+    } else {
+      // Final result
+      const finalNorm = ((rouletteAngle % 360) + 360) % 360
+      const finalIdx = Math.floor(((360 - finalNorm) % 360) / step) % rouletteItems.length
+      center.classList.remove('spinning')
+      center.textContent = 'SPIN'
+      pointer.classList.remove('tick')
+      playDing()
+      resultEl.innerHTML = `<div class="roulette-result-popup">🎉 ${rouletteItems[finalIdx]}</div>`
+      rouletteSpinning = false
+    }
+  }
+  rouletteRAF = requestAnimationFrame(animate)
+}
+renderRouletteWheel(); renderRouletteItems()
+
+/* ══════════════════════════════════════════════════
+   OVERLAPPING PHOTOS
+══════════════════════════════════════════════════ */
+let overlapPhotos=[]
+function addOverlapPhoto(input) {
+  const files = Array.from(input.files)
+  files.forEach(f=>{
+    const reader=new FileReader()
+    reader.onload=e=>{
+      const label=prompt(`사진 ${overlapPhotos.length+1}의 정답(설명):`, `사진 ${overlapPhotos.length+1}`) || `사진 ${overlapPhotos.length+1}`
+      overlapPhotos.push({src:e.target.result, label})
+      renderOverlap()
+    }
+    reader.readAsDataURL(f)
+  })
+  input.value=''
+}
+function removeOverlapOne() {
+  if(overlapPhotos.length>0){ overlapPhotos.pop(); renderOverlap() }
+}
+function clearOverlap() { overlapPhotos=[]; renderOverlap() }
+function renderOverlap() {
+  const stage=document.getElementById('overlap-stage')
+  const count=document.getElementById('overlap-count')
+  const labels=document.getElementById('overlap-labels')
+  if(overlapPhotos.length===0){
+    stage.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;">🖼 사진을 추가해주세요</div>'
+    count.textContent='사진 0장'
+    labels.innerHTML=''
+    return
+  }
+  const n=overlapPhotos.length
+  const opacity = n === 1 ? 1 : (1 / (n*0.5 + 0.5))
+  stage.innerHTML = overlapPhotos.map((p,i)=>`<img src="${p.src}" style="opacity:${opacity};">`).join('')
+  count.textContent = `사진 ${n}장 겹쳐짐 (각 ${(opacity*100).toFixed(0)}%)`
+  labels.innerHTML = `
+    <p class="section-label">정답 (진행자 전용)</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      ${overlapPhotos.map((p,i)=>`<span class="pool-word">${i+1}. ${p.label}</span>`).join('')}
+    </div>`
+}
+renderOverlap()
+
+/* ══════════════════════════════════════════════════
+   LADDER
+══════════════════════════════════════════════════ */
+let ladderData=null
+let ladderWalking=false
+let ladderRAF=null
+const LADDER_COLORS=['#ef4444','#fbbf24','#10b981','#0891b2','#6366f1','#a855f7','#ec4899','#f97316']
+
+function parseList(str) {
+  return str.split(/[,\n]/).map(s=>s.trim()).filter(Boolean)
+}
+
+function generateLadder() {
+  if(ladderWalking)return
+  const players = parseList(document.getElementById('ladder-players').value)
+  const results = parseList(document.getElementById('ladder-results').value)
+  if(players.length<2||players.length>8){alert('참가자는 2~8명이어야 합니다');return}
+  if(results.length !== players.length){alert('참가자와 결과 수가 같아야 합니다');return}
+
+  const n = players.length, rows = 12
+  const rungs = []
+  // Cleaner rung generation:
+  //  - no adjacent rungs in same row
+  //  - no rung at the same column-position in two consecutive rows
+  //    (prevents tight zigzags that look like long horizontals)
+  for(let r=0;r<rows;r++){
+    const row=[]
+    for(let c=0;c<n-1;c++){
+      const prevSameRow = row[c-1] || false
+      const sameColPrevRow = (r > 0 ? rungs[r-1][c] : false)
+      const canPlace = !prevSameRow && !sameColPrevRow
+      row.push(canPlace && Math.random() < 0.55)
+    }
+    rungs.push(row)
+  }
+  // Guarantee at least one rung per row for visual interest
+  for(let r=0;r<rows;r++){
+    if(!rungs[r].some(Boolean) && n >= 2) {
+      const candidates = []
+      for(let c=0;c<n-1;c++) {
+        const adj = (c>0 && rungs[r][c-1]) || (c<n-2 && rungs[r][c+1])
+        const sameCol = (r>0 && rungs[r-1][c])
+        if(!adj && !sameCol) candidates.push(c)
+      }
+      if(candidates.length>0) rungs[r][candidates[Math.floor(Math.random()*candidates.length)]] = true
+    }
+  }
+  ladderData = { players, results, rungs, n, rows }
+  drawLadder()
+  document.getElementById('ladder-result').textContent=''
+}
+
+/* Returns pixel coordinates for path */
+function ladderGeometry() {
+  const { n, rows } = ladderData
+  const W=400, H=640
+  const padX=40, padY=80
+  const colW = n>1 ? (W - 2*padX)/(n-1) : 0
+  const rowH = (H - 2*padY)/(rows+1)
+  return { W, H, padX, padY, colW, rowH }
+}
+
+function pathToPixels(path) {
+  const { padX, padY, colW, rowH, H } = ladderGeometry()
+  return path.map(pt => {
+    const x = padX + pt[0]*colW
+    let y
+    if(pt[1]==='top') y = padY - 18
+    else if(pt[1]==='bot') y = H - padY + 18
+    else y = padY + pt[1]*rowH
+    return [x, y]
+  })
+}
+
+function drawLadder(animatedPathPixels=null, headXY=null, finishedIdx=-1, finishedCol=-1) {
+  if(!ladderData)return
+  const svg=document.getElementById('ladder-svg')
+  const { players, results, rungs, n, rows } = ladderData
+  const { W, H, padX, padY, colW, rowH } = ladderGeometry()
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+
+  let html = ''
+  // Vertical lines (background ladder rails)
+  for(let i=0;i<n;i++){
+    const x = padX + i*colW
+    html += `<line x1="${x}" y1="${padY-25}" x2="${x}" y2="${H-padY+25}" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>`
+  }
+  // Rungs
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<n-1;c++){
+      if(rungs[r][c]){
+        const x1 = padX + c*colW
+        const x2 = padX + (c+1)*colW
+        const y = padY + (r+1)*rowH
+        html += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-linecap="round"/>`
+      }
+    }
+  }
+  // Animated path
+  if(animatedPathPixels && animatedPathPixels.length>0) {
+    const color = LADDER_COLORS[finishedIdx >= 0 ? finishedIdx % LADDER_COLORS.length : 0]
+    let d = ''
+    animatedPathPixels.forEach((pt,i)=>{ d += (i===0?'M':'L') + pt[0] + ' ' + pt[1] + ' ' })
+    html += `<path d="${d}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px ${color}cc)"/>`
+  }
+  // Moving head/marker
+  if(headXY) {
+    const color = headXY[2] || '#ffd700'
+    html += `<circle cx="${headXY[0]}" cy="${headXY[1]}" r="11" fill="#fff" stroke="${color}" stroke-width="3" class="ladder-marker-rim" style="color:${color}"/>`
+    html += `<circle cx="${headXY[0]}" cy="${headXY[1]}" r="5" fill="${color}"/>`
+  }
+  // Top labels (drawn last so they sit on top)
+  for(let i=0;i<n;i++){
+    const x = padX + i*colW
+    const c = LADDER_COLORS[i%LADDER_COLORS.length]
+    const isActive = (i === (window._ladderActiveIdx ?? -1))
+    html += `<rect x="${x-32}" y="12" width="64" height="38" rx="10" fill="${c}" stroke="#fff" stroke-width="${isActive?3:1.5}" style="cursor:${ladderWalking?'not-allowed':'pointer'};filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))" onclick="${ladderWalking?'':'walkLadder('+i+')'}"/>`
+    html += `<text x="${x}" y="36" fill="#fff" font-size="13" font-weight="800" text-anchor="middle" pointer-events="none">${(players[i]||'').slice(0,5)}</text>`
+  }
+  // Bottom labels
+  for(let i=0;i<n;i++){
+    const x = padX + i*colW
+    const isFinish = (i === finishedCol)
+    const fill = isFinish ? '#fbbf24' : 'rgba(255,255,255,0.06)'
+    const stroke = isFinish ? '#fbbf24' : 'rgba(255,255,255,0.22)'
+    const textColor = isFinish ? '#000' : '#cbd5e1'
+    const style = isFinish ? 'style="animation:finishPulse 0.8s ease-in-out infinite;color:#fbbf24"' : ''
+    html += `<rect x="${x-32}" y="${H-50}" width="64" height="38" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="${isFinish?3:1.5}" ${style}/>`
+    html += `<text x="${x}" y="${H-26}" fill="${textColor}" font-size="13" font-weight="800" text-anchor="middle">${(results[i]||'').slice(0,5)}</text>`
+  }
+  svg.innerHTML = html
+}
+function computePath(startCol) {
+  const { rungs, n, rows } = ladderData
+  let col = startCol
+  const path = [[col,'top']]
+  path.push([col, 0])
+  for(let r=0;r<rows;r++){
+    if(col<n-1 && rungs[r][col]){
+      path.push([col, r+1])
+      col++
+      path.push([col, r+1])
+    } else if(col>0 && rungs[r][col-1]){
+      path.push([col, r+1])
+      col--
+      path.push([col, r+1])
+    } else {
+      path.push([col, r+1])
+    }
+  }
+  path.push([col, rows+1])
+  path.push([col,'bot'])
+  return path
+}
+
+/* Compute cumulative pixel lengths along path for time-based animation */
+function pathSegments(pxPath) {
+  const segs = []
+  let total = 0
+  for(let i=1;i<pxPath.length;i++){
+    const [x1,y1] = pxPath[i-1]
+    const [x2,y2] = pxPath[i]
+    const len = Math.hypot(x2-x1, y2-y1)
+    segs.push({ x1, y1, x2, y2, len, start: total })
+    total += len
+  }
+  return { segs, total }
+}
+function pointAt(segs, dist) {
+  for(const s of segs) {
+    if(dist <= s.start + s.len) {
+      const u = (dist - s.start) / (s.len || 1)
+      return [ s.x1 + (s.x2 - s.x1) * u, s.y1 + (s.y2 - s.y1) * u ]
+    }
+  }
+  const last = segs[segs.length-1]
+  return [last.x2, last.y2]
+}
+
+function walkLadder(idx) {
+  if(!ladderData || ladderWalking) return
+  ladderWalking = true
+  window._ladderActiveIdx = idx
+  cancelAnimationFrame(ladderRAF)
+
+  const path = computePath(idx)
+  const endCol = path[path.length-1][0]
+  const pxPath = pathToPixels(path)
+  const { segs, total } = pathSegments(pxPath)
+  const color = LADDER_COLORS[idx % LADDER_COLORS.length]
+
+  document.getElementById('ladder-result').innerHTML = `<span class="roulette-status">✦ 내려가는 중 ✦</span>`
+
+  // Animation: 3.5 seconds with ease-in-out, faster on vertical, slower on rungs
+  const duration = 3500
+  const startTime = performance.now()
+  let lastDistTick = 0
+
+  function easeInOut(t) {
+    // ease-in-out cubic for organic slow-fast-slow
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2
+  }
+
+  function animate(now) {
+    const elapsed = now - startTime
+    const t = Math.min(elapsed / duration, 1)
+    const eased = easeInOut(t)
+    const dist = eased * total
+
+    // Build pixel path up to current point
+    const traveled = []
+    let acc = 0
+    for(const s of segs) {
+      if(dist >= s.start + s.len) {
+        if(traveled.length === 0) traveled.push([s.x1, s.y1])
+        traveled.push([s.x2, s.y2])
+      } else {
+        if(traveled.length === 0) traveled.push([s.x1, s.y1])
+        const u = (dist - s.start) / (s.len || 1)
+        traveled.push([ s.x1 + (s.x2 - s.x1) * u, s.y1 + (s.y2 - s.y1) * u ])
+        break
+      }
+    }
+    const head = pointAt(segs, dist)
+    drawLadder(traveled, [head[0], head[1], color], idx, -1)
+
+    // Audio tick at vertical-to-horizontal transitions (rungs)
+    if(dist - lastDistTick > total / 12) {
+      lastDistTick = dist
+      playTick(0.08, 700 + Math.random()*200)
+    }
+
+    if(t < 1) {
+      ladderRAF = requestAnimationFrame(animate)
+    } else {
+      drawLadder(pxPath, null, idx, endCol)
+      playDing()
+      const result = ladderData.results[endCol]
+      document.getElementById('ladder-result').innerHTML =
+        `<div class="roulette-result-popup" style="font-size:24px;">${ladderData.players[idx]} → 🎉 ${result}</div>`
+      ladderWalking = false
+      window._ladderActiveIdx = -1
+    }
+  }
+  ladderRAF = requestAnimationFrame(animate)
+}
+generateLadder()
+</script>
+</body>
 </html>
