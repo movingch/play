@@ -201,7 +201,7 @@ body {
 }
 .game-card:active { transform: scale(0.94); }
 .game-card .emoji { font-size: 34px; margin-bottom: 6px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
-.game-card .name { font-size: 12px; font-weight: 800; color: #fff; text-align: center; line-height: 1.3; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.game-card .name { font-size: 14px; font-weight: 900; color: #fff; text-align: center; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.5); letter-spacing: -0.035em; }
 .game-card .badge-new {
   position: absolute; top: 6px; right: 6px;
   font-size: 9px; font-weight: 900;
@@ -552,20 +552,29 @@ body {
     radial-gradient(ellipse at center, rgba(255,255,255,0.055), transparent 58%),
     linear-gradient(180deg, rgba(255,255,255,0.03), transparent 70%);
 }
+.hero-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2.2vw, 22px);
+  margin: 4px auto 0;
+}
 .hero-logo-img {
-  max-width: 360px;
-  width: min(82%, 360px);
-  margin: 0 auto 18px;
-  border-radius: 12px;
-  filter: drop-shadow(0 10px 28px rgba(255,255,255,0.08));
+  width: clamp(42px, 8vw, 78px);
+  height: clamp(42px, 8vw, 78px);
+  object-fit: contain;
+  border-radius: 10px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,0.12));
 }
 .hero-tagline {
-  font-size: clamp(30px, 7vw, 54px);
+  font-size: clamp(42px, 8.8vw, 86px);
   font-weight: 950;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.06em;
   color: #fff;
-  margin-top: 2px;
-  text-shadow: 0 0 24px rgba(103,232,249,0.24);
+  line-height: 1;
+  margin: 0;
+  text-shadow: 0 0 26px rgba(103,232,249,0.25);
 }
 .hero-desc {
   font-size: clamp(15px, 2.7vw, 22px);
@@ -591,10 +600,10 @@ body {
   margin-bottom: 8px;
 }
 .game-card .name {
-  font-size: clamp(15px, 2.8vw, 26px);
+  font-size: clamp(17px, 3.2vw, 30px);
   font-weight: 950;
-  letter-spacing: -0.04em;
-  line-height: 1.12;
+  letter-spacing: -0.05em;
+  line-height: 1.08;
 }
 .section-label {
   color: rgba(255,255,255,0.58);
@@ -619,8 +628,8 @@ body {
   .container { max-width: 1180px; padding-left: 32px; padding-right: 32px; }
   .hdr { max-width: 1180px; }
   #page-home .container { max-width: 1220px; }
-  .home-hero { margin-top: 30px; padding: 40px 42px 38px; }
-  .hero-logo-img { max-width: 520px; width: 46%; margin-bottom: 22px; }
+  .home-hero { margin-top: 30px; padding: 44px 42px 40px; }
+  .hero-logo-img { width: 82px; height: 82px; margin: 0; }
   .games-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
   .game-card { aspect-ratio: 1.45 / 1; min-height: 170px; border-radius: 24px; }
 }
@@ -638,8 +647,10 @@ body {
 <div id="page-home" class="page active fade-in">
   <div class="container">
     <div class="home-hero">
-      <img class="hero-logo-img" id="hero-logo" alt="움직이는교회">
-      <div class="hero-tagline">움공플레이</div>
+      <div class="hero-brand" aria-label="움공플레이">
+        <img class="hero-logo-img" id="hero-logo" alt="움직이는교회 로고">
+        <div class="hero-tagline">움공플레이</div>
+      </div>
       <div class="hero-desc">상황에 맞는 게임으로 즐겁게</div>
     </div>
 
